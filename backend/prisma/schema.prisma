@@ -1,0 +1,72 @@
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Level {
+  BEGINNER
+  MID
+  ADVANCED
+  PRO
+}
+
+model User {
+  id             Int     @id @default(autoincrement())
+  login          String  @unique
+  nickname       String
+  password       String
+  profilePicture String?
+  level          Level   @default(BEGINNER)
+  description    String?
+
+  posts        Post[]
+  friendsAdded Friends[]      @relation("UserAddedFriend")
+  friendsOf    Friends[]      @relation("FriendAddedUser")
+  participants Participants[]
+}
+
+model Friends {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  friendId  Int
+  createdAt DateTime @default(now())
+
+  user   User @relation("UserAddedFriend", fields: [userId], references: [id])
+  friend User @relation("FriendAddedUser", fields: [friendId], references: [id])
+
+  @@unique([userId, friendId])
+}
+
+model Gym {
+  id        Int     @id @default(autoincrement())
+  name      String
+  latitude  Float
+  longitude Float
+  link      String?
+
+  posts Post[]
+}
+
+model Post {
+  id          Int    @id @default(autoincrement())
+  userId      Int
+  gymId       Int
+  description String
+
+  user         User           @relation(fields: [userId], references: [id])
+  gym          Gym            @relation(fields: [gymId], references: [id])
+  participants Participants[]
+}
+
+model Participants {
+  id            Int @id @default(autoincrement())
+  postId        Int
+  participantId Int
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [participantId], references: [id], onDelete: Cascade)
+}
