@@ -1,7 +1,21 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+    plugins: [react()],
+    resolve: {
+        alias: {
+            // Tworzymy alias '@', który wskazuje na folder 'src'
+            '@': path.resolve(__dirname, './src'),
+        },
+    },
+    css: {
+        preprocessorOptions: {
+            scss: {
+                // Teraz używamy aliasu. Ważne: Sass wymaga średnika na końcu!
+                additionalData: `@use "@/variables" as *;`
+            }
+        }
+    }
 })

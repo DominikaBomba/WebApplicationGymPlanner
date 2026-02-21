@@ -10,7 +10,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
 }
 
 enum Level {
@@ -26,7 +26,7 @@ model User {
   nickname       String
   password       String
   profilePicture String?
-  level          Level   @default(BEGINNER)
+  level            Level   @default(BEGINNER)
   description    String?
 
   posts        Post[]
