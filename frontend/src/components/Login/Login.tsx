@@ -3,7 +3,13 @@ import {useNavigate} from "react-router";
 import {useState} from "react";
 import {useMutation} from "@tanstack/react-query";
 
-export default function Login() {
+interface LoginProps {
+    onClose: () => void;
+    onSwitchToRegister: () => void;
+}
+
+
+export default function Login({ onClose , onSwitchToRegister}: LoginProps) {
     const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
@@ -19,14 +25,14 @@ export default function Login() {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || "Login failed");
+                throw new Error(errorData.error || "Register failed");
             }
 
             return response.json();
         },
         onSuccess: (data) => {
             localStorage.setItem("token", data.token); //saving token
-            navigate("/"); //redirect
+            onClose();
         },
     });
 
@@ -37,7 +43,9 @@ export default function Login() {
 
     return (
         <div className={styles["login-container"]}>
+
             <div className={styles["login-card"]}>
+                <button className={styles["close-x"]} onClick={onClose}>✕</button>
                 <div className={styles["login-form-section"]}>
                     <div className={styles["form-header"]}>
                         <span className={styles["home-emoji"]}></span>
@@ -80,8 +88,11 @@ export default function Login() {
                         >
                             {isPending ? "Logging in..." : "Login"}
                         </button>
-                        <p> <a href="#">Sign Up</a></p>
 
+                        <p>
+                            You don't have an account?
+                            <a href="#" onClick={(e) => { e.preventDefault(); onSwitchToRegister(); }}> SignUp</a>
+                        </p>
                     </form>
                 </div>
 

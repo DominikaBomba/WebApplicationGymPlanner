@@ -1,23 +1,59 @@
 import Navbar from "./components/Navbar";
+import Register from "./components/Register";
 import {useLocation, Route, Routes} from "react-router";
-import Login from "./scenes/Login";
+import Login from "./components/Login";
+import {useState} from "react";
+import Profile from "./scenes/Profile"
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 
 
 function App() {
-
+    const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [authMode, setAuthMode] = useState<"login" | "register">("login");
     const location = useLocation();
 
     const showNavbar = location.pathname !== "/login";
     return (
         <>
 
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=bar_chart_4_bars,home_app_logo,man,notifications,settings"/>
+            <button onClick={() => { setAuthMode("register"); setIsAuthOpen(true); }}>
+                Zarejestruj się
+            </button>
+
+            {isAuthOpen && (
+                <div className="login-overlay">
+                    {authMode === "login" ? (
+                        <Login
+                            onClose={() => setIsAuthOpen(false)}
+                            onSwitchToRegister={() => setAuthMode("register")}
+                        />
+                    ) : (
+                        <Register
+                            onClose={() => setIsAuthOpen(false)}
+                            onSwitchToLogin={() => setAuthMode("login")}
+                        />
+                    )}
+                </div>
+            )}
+
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=bar_chart_4_bars,home_app_logo,logout,man,notifications,settings"/>
+
+
 
             {showNavbar && <Navbar />}
 
             <Routes>
-                <Route path="/login"  element={<Login/>} />
 
+
+                {/* Tutaj chronisz ścieżkę profilu */}
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute onOpenLogin={() => setIsAuthOpen(true)}>
+                            <Profile />
+                        </ProtectedRoute>
+                    }
+                />
             </Routes>
 
         </>

@@ -7,12 +7,23 @@ export const registerUser = async (req: Request, res: Response) => {
     try {
         const { login, nickname, password } = req.body;
 
-        const existingUser = await prisma.user.findUnique({
-            where: { login },
+        const existingUser = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    { login: login },
+                    { nickname: nickname }
+                ]
+            },
         });
 
         if (existingUser) {
-            return res.status(400).json({ error: 'User with this email already exists.' });
+            // 2. Determine which field is taken to give a specific error message
+            if (existingUser.login === login) {
+                return res.status(400).json({ error: 'User with this email already exists.' });
+            }
+            if (existingUser.nickname === nickname) {
+                return res.status(400).json({ error: 'This nickname is already taken.' });
+            }
         }
 
         const saltRounds = 10;
@@ -70,7 +81,7 @@ export const loginUser = async (req: Request, res: Response) => {
         );
 
         return res.status(200).json({
-            message: 'Login successful!',
+            message: 'Register successful!',
             token: token,
             user: {
                 id: user.id,
@@ -80,7 +91,7 @@ export const loginUser = async (req: Request, res: Response) => {
         });
 
     } catch (error) {
-        console.error("Login error:", error);
+        console.error("Register error:", error);
         return res.status(500).json({ error: 'Internal server error during login.' });
     }
 };

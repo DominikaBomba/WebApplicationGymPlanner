@@ -1,4 +1,5 @@
 .Navbar {
+  position: fixed;
   width: 100px;
   height: 100vh;
   display: flex;
@@ -55,6 +56,7 @@
   }
 
   .NavbarLink {
+    cursor: pointer;
     text-decoration: none;
     font-size: 1.2rem;
     color: $color-text-muted;

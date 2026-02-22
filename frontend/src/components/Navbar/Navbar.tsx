@@ -1,8 +1,24 @@
 import styles from './Navbar.module.scss';
 import { Link } from "react-router";
 import logoPrototype from '../../assets/logo_prototype.png';
-
+import { useNavigate } from "react-router-dom";
 export default function Navbar() {
+
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+
+        localStorage.removeItem("token");
+
+        // 2. Opcjonalnie: czyścimy inne dane (np. z cache TanStack Query)
+        // queryClient.clear();
+
+
+        navigate("/");
+
+
+        window.location.reload();
+    };
     return (
         <nav className={styles.Navbar}>
 
@@ -20,7 +36,7 @@ export default function Navbar() {
                         </Link>
                     </li>
                     <li>
-                        <Link to="/stats" className={styles.NavbarLink}>
+                        <Link to="/profile" className={styles.NavbarLink}>
                             <span className="material-symbols-outlined">man</span>
                         </Link>
                     </li>
@@ -30,11 +46,11 @@ export default function Navbar() {
                      </ul>
 
                 <ul className={styles.PillContainer}>
-                    <li><Link to="/notifications" className={styles.NavbarLink}>
-                        <span className="material-symbols-outlined">notifications</span>
-
-                    </Link>
+                    <li><a className={styles.NavbarLink} onClick={() => handleLogout()}>    <span className="material-symbols-outlined">logout</span></a>
                     </li>
+
+
+
                     <li>
                         <Link to="/settings" className={styles.NavbarLink}>
                         <span className="material-symbols-outlined">settings</span>

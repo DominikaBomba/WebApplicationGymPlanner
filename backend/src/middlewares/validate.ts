@@ -12,9 +12,21 @@ export const validate = (schema: ZodObject) =>
 
             return next();
         } catch (error: any) {
-            return res.status(400).json({
-                error: "Validation failed",
-                details: error.errors
-            });
+            try {
+                const parsedErrors = JSON.parse(error.message);
+
+                return res.status(400).json({
+                    error: "Validation failed",
+                    details: parsedErrors.map((err: any) => ({
+                        field: err.path ? err.path.join('.') : 'unknown',
+                        message: err.message
+                    }))
+                });
+            } catch (fallbackError) {
+                return res.status(400).json({
+                    error: "Validation failed",
+                    details: error.message
+                });
+            }
         }
     };

@@ -21,6 +21,8 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     try {
         // 2. Verify token
         const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_key';
+
+
         const decoded = jwt.verify(token, jwtSecret) as { userId: string; login: string };
 
         // 3. Add user info to request object
