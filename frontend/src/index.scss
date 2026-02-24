@@ -17,3 +17,39 @@ font-family: 'Outfit', sans-serif;
 .login-overlay{
   background-color: rgba(0, 0, 0, 0.5);
 }
+
+.registerBtn {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+   padding: 1.3rem 2.5rem;
+   border-radius: 5rem;
+   border: none;
+
+   // Kolorystyka
+   background-color: $color-dark-bg;
+   color: $color-bg-main;
+
+   // Typografia
+   font-size: 1rem;
+   font-weight: 700;
+   text-transform: uppercase;
+   letter-spacing: 0.05rem;
+
+
+   box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
+   cursor: pointer;
+   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+   user-select: none;
+
+   &:hover {
+
+     transform: translateY(-0.2rem) scale(1.02);
+     box-shadow: 0 0.8rem 2rem rgba($color-primary, 0.3);
+   }
+
+   &:active {
+     transform: translateY(0) scale(0.98);
+   }
+ }

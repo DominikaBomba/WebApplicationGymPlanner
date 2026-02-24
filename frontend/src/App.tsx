@@ -12,14 +12,25 @@ function App() {
     const [authMode, setAuthMode] = useState<"login" | "register">("login");
     const location = useLocation();
 
+
+    const token = localStorage.getItem("token");
+
     const showNavbar = location.pathname !== "/login";
     return (
         <>
 
-            <button onClick={() => { setAuthMode("register"); setIsAuthOpen(true); }}>
-                Zarejestruj się
-            </button>
 
+            { !token && (
+                <button
+                    className="registerBtn"
+                    onClick={() => {
+                        setAuthMode("register");
+                        setIsAuthOpen(true);
+                    }}
+                >
+                   Log In
+                </button>
+            )}
             {isAuthOpen && (
                 <div className="login-overlay">
                     {authMode === "login" ? (
