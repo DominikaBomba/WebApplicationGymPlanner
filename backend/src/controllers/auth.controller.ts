@@ -34,6 +34,9 @@ export const registerUser = async (req: Request, res: Response) => {
                 login,
                 nickname,
                 password: hashedPassword,
+                level: "BEGINNER",
+                description: "opisopis",
+                profilePicture : ""
             },
         });
 
@@ -43,6 +46,9 @@ export const registerUser = async (req: Request, res: Response) => {
                 id: newUser.id,
                 login: newUser.login,
                 nickname: newUser.nickname,
+                level: newUser.level,       // Fetched from DB
+                description: newUser.description ,// Fetched from DB
+                profilePicture: newUser.profilePicture
             },
         });
     } catch (error) {
@@ -80,13 +86,17 @@ export const loginUser = async (req: Request, res: Response) => {
             { expiresIn: '24h' } // po jakim czasie wygaśnie token
         );
 
+        // Fragment funkcji loginUser w auth.controller.ts
         return res.status(200).json({
-            message: 'Register successful!',
+            message: 'Login successful!',
             token: token,
             user: {
                 id: user.id,
                 login: user.login,
                 nickname: user.nickname,
+                level: user.level,
+                description: user.description,
+                profilePicture: user.profilePicture
             },
         });
 

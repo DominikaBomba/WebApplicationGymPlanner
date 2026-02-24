@@ -6,6 +6,7 @@ export interface AuthRequest extends Request {
     user?: {
         userId: string;
         login: string;
+
     };
 }
 
@@ -23,7 +24,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
         const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_key';
 
 
-        const decoded = jwt.verify(token, jwtSecret) as { userId: string; login: string };
+        const decoded = jwt.verify(token, jwtSecret) as { userId: string; login: string;};
 
         // 3. Add user info to request object
         req.user = decoded;

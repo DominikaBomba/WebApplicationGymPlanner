@@ -5,7 +5,7 @@ import Login from "./components/Login";
 import {useState} from "react";
 import Profile from "./scenes/Profile"
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
-
+import Settings from "./scenes/Settings/Settings.tsx";
 
 function App() {
     const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -51,6 +51,14 @@ function App() {
                     element={
                         <ProtectedRoute onOpenLogin={() => setIsAuthOpen(true)}>
                             <Profile />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/settings"
+                    element={
+                        <ProtectedRoute onOpenLogin={() => setIsAuthOpen(true)}>
+                            <Settings />
                         </ProtectedRoute>
                     }
                 />
