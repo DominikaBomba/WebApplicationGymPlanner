@@ -63,12 +63,18 @@ export const loginUser = async (req: Request, res: Response) => {
 
         const user = await prisma.user.findUnique({
             where: { login },
+            include: {
+                friendsAdded: { include: { friend: { select: { id: true, nickname: true, profilePicture: true, level: true } } } },
+                friendsOf: { include: { user: { select: { id: true, nickname: true, profilePicture: true, level: true } } } }
+            }
         });
-
         if (!user) {
             return res.status(401).json({ error: 'Invalid email or password.' });
         }
-
+        const friendsList = [
+            ...user.friendsAdded.map(f => f.friend),
+            ...user.friendsOf.map(f => f.user)
+        ];
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
@@ -88,7 +94,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
         // Fragment funkcji loginUser w auth.controller.ts
         return res.status(200).json({
-            message: 'Login successful!',
+            message: 'Search successful!',
             token: token,
             user: {
                 id: user.id,
@@ -96,7 +102,8 @@ export const loginUser = async (req: Request, res: Response) => {
                 nickname: user.nickname,
                 level: user.level,
                 description: user.description,
-                profilePicture: user.profilePicture
+                profilePicture: user.profilePicture,
+                friends: friendsList
             },
         });
 

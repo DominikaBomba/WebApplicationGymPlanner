@@ -1,12 +1,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode, useMemo, useCallback } from "react";
+import type {UserData} from "./types/UserData.ts";
 
-interface UserData {
-    nickname: string;
-    login: string;
-    level?: string;
-    description?: string;
-    profilePicture?: string;
-}
+
 
 interface AuthContextType {
     user: UserData | null;

@@ -71,7 +71,7 @@ export default function Settings() {
 
             if (response.ok) {
                 await refreshUser(); // KLUCZOWE: Odświeżamy dane w całej aplikacji (Context)
-                setMessage("Profile updated successfully!");
+                setMessage("Post updated successfully!");
             } else {
                 setMessage("Failed to update profile.");
             }

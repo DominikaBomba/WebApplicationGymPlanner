@@ -6,6 +6,7 @@ import {useState} from "react";
 import Profile from "./scenes/Profile"
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import Settings from "./scenes/Settings/Settings.tsx";
+import Search from "./components/Search";
 
 function App() {
     const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -50,7 +51,7 @@ function App() {
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=bar_chart_4_bars,home_app_logo,logout,man,notifications,settings"/>
 
 
-
+            <Search/>
             {showNavbar && <Navbar />}
 
             <Routes>
@@ -71,6 +72,13 @@ function App() {
                         <ProtectedRoute onOpenLogin={() => setIsAuthOpen(true)}>
                             <Settings />
                         </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/profile/:nickname"
+                    element={
+                        <Profile/>
                     }
                 />
             </Routes>

@@ -1,0 +1,39 @@
+import styles from './Post.module.scss';
+import { useAuth } from "../../AuthContext"; // Importujesz swój nowy hook
+
+export default function Post() {
+    const { user, loading } = useAuth();
+
+    if (loading) return <div className={styles.loading}>Loading...</div>;
+
+    if (!user) return null;
+
+    return (
+        <div className={styles["profile-container"]}>
+
+            <h1>{user.nickname}</h1>
+            <div className={styles["user-info"]}>
+                <img
+                    src={user.profilePicture || "https://via.placeholder.com/150"}
+                    alt="Avatar Preview"
+                    className={styles["avatar-preview"]}
+                />
+                <div className={styles.details}>
+                    <p><strong>Email:</strong> {user.login}</p>
+                    <p><strong>Level:</strong> {user.level || "Beginner"}</p>
+                    <p><strong>About me:</strong> {user.description || "No description provided."}</p>
+                </div>
+                <div> friends</div>
+                <div className={styles["friendsList"]} >
+                    {user.friends.map(f => (
+                        <div key={f.id}  className={styles["friendCard"]} >
+                            <img src={f.profilePicture || "placeholder.png"} alt={f.nickname} />
+
+                        </div>
+                    ))}
+                </div>
+
+            </div>
+        </div>
+    );
+}

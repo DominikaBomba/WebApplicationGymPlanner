@@ -5,7 +5,6 @@ import { prisma } from '../db/prisma'; // Dodaj ten import
 const router = Router();
 router.get('/me', authenticate, async (req: AuthRequest, res: Response) => {
     try {
-        // Konwersja stringa na liczbę (Number), aby pasowało do int4 w bazie
         const userId = Number(req.user?.userId);
 
         if (isNaN(userId)) {
@@ -13,14 +12,24 @@ router.get('/me', authenticate, async (req: AuthRequest, res: Response) => {
         }
 
         const user = await prisma.user.findUnique({
-            where: { id: userId }, // Teraz typy się zgadzają (number === number)
-            select: {
-                id: true,
-                login: true,
-                nickname: true,
-                level: true,
-                description: true,
-                profilePicture: true
+            where: { id: userId },
+            include: {
+
+                friendsAdded: {
+                    include: {
+                        friend: {
+                            select: { id: true, nickname: true, profilePicture: true, level: true }
+                        }
+                    }
+                },
+
+                friendsOf: {
+                    include: {
+                        user: {
+                            select: { id: true, nickname: true, profilePicture: true, level: true }
+                        }
+                    }
+                }
             }
         });
 
@@ -28,13 +37,51 @@ router.get('/me', authenticate, async (req: AuthRequest, res: Response) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
+        const friendsList = [
+            ...user.friendsAdded.map(f => f.friend),
+            ...user.friendsOf.map(f => f.user)
+        ];
+
+        // Usuwamy surowe relacje Prisma z obiektu przed wysłaniem
+        const { friendsAdded, friendsOf, ...userProfile } = user;
+
         return res.status(200).json({
             message: 'Authenticated successfully!',
-            user: user
+            user: {
+                ...userProfile,
+                friends: friendsList
+            }
         });
     } catch (error) {
+        console.error(error);
         return res.status(500).json({ error: 'Error fetching user data' });
     }
+});
+
+router.get("/:nickname", authenticate, async (req: AuthRequest, res: Response) => {
+    try{
+        const targetUsername = String(req.params.nickname);
+     //   console.log(targetUsername);
+        const user = await prisma.user.findFirst({
+            where: { nickname: targetUsername },
+            select: {
+                id: true,
+                nickname: true,
+                level: true,
+                description: true,
+                profilePicture: true,
+
+
+            }
+        });
+        console.log(user);
+        if (!user) return res.status(404).json({ error: "Użytkownik nie istnieje" });
+
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ error: "Błąd serwera" });
+    }
+
 });
 router.patch('/update', authenticate, async (req: AuthRequest, res: Response) => {
     try{

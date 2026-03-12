@@ -1,0 +1,74 @@
+.searchWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 300px; // Możesz dostosować do Navbaru
+
+  .inputArea {
+    input {
+      width: 100%;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid #ddd;
+      background: #f9f9f9;
+      transition: all 0.2s;
+
+      &:focus {
+        outline: none;
+        background: #fff;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+      }
+    }
+  }
+
+  .resultsDropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    z-index: 1000;
+    overflow: hidden;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .resultItem {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #333;
+    transition: background 0.2s;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: #f8f9fa; }
+
+    img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      margin-right: 12px;
+      object-fit: cover;
+    }
+
+    .userMeta {
+      display: flex;
+      flex-direction: column;
+
+      .nickname {
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .level {
+        font-size: 0.75rem;
+        color: #777;
+        text-transform: uppercase;
+      }
+    }
+  }
+}
