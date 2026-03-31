@@ -8,7 +8,7 @@ export default function Search() {
     const [isOpen, setIsOpen] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
 
-    // Zamykanie wyników po kliknięciu poza komponent
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -21,22 +21,26 @@ export default function Search() {
 
     useEffect(() => {
         if (searchTerm.length < 2) {
-            setResults([]);
+      //      setResults([]);
+          //  console.log("za krotkie: " + searchTerm.length);
             return;
         }
 
         const delay = setTimeout(async () => {
-            const response = await fetch(`http://localhost:3000/api/users/search?q=${searchTerm}`, {
+            const response = await fetch(`http://localhost:3000/api/users/${searchTerm}`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             const data = await response.json();
+            //console.log( data);
             setResults(data);
+            //console.log( results);
             setIsOpen(true);
         }, 300);
 
         return () => clearTimeout(delay);
     }, [searchTerm]);
 
+//console.log(results);
     return (
         <div className={styles.searchWrapper} ref={searchRef}>
             <div className={styles.inputArea}>
@@ -49,7 +53,7 @@ export default function Search() {
                 />
             </div>
 
-            {isOpen && results.length > 0 && (
+            {isOpen &&(
                 <div className={styles.resultsDropdown}>
                     {results.map(user => (
                         <Link

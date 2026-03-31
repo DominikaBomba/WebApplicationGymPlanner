@@ -5,9 +5,8 @@ import { supabase } from "../../supabaseClient.ts";
 import { useAuth } from "../../AuthContext.tsx"; // Import hooka
 
 export default function Settings() {
-    const { user, refreshUser } = useAuth(); // Pobieramy user i funkcję odświeżania
+    const { user, refreshUser } = useAuth();
 
-    // Inicjalizujemy stany wartościami z contextu
     const [level, setLevel] = useState(user?.level || "BEGGINER");
     const [description, setDescription] = useState(user?.description || "");
     const [profilePictureUrl, setProfilePictureUrl] = useState("");
@@ -16,7 +15,6 @@ export default function Settings() {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Synchronizacja stanu lokalnego, gdyby user załadował się z opóźnieniem
     useEffect(() => {
         if (user) {
             setLevel(user.level || "BEGGINER");
