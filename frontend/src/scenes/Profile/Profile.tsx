@@ -3,6 +3,7 @@ import { useAuth } from "../../AuthContext";
 import { useEffect, useState } from 'react';
 import styles from './Profile.module.scss';
 import type {UserData} from "../../types/UserData.ts";
+import {Link} from "react-router";
 
 export default function Profile() {
     const { nickname } = useParams<{ nickname: string }>();
@@ -35,7 +36,7 @@ export default function Profile() {
             }
 
             alert("Dodano do znajomych!");
-            // Opcjonalnie: odśwież listę znajomych po dodaniu
+
             fetchFriends(displayedUser.nickname);
 
         } catch (err: any) {
@@ -137,7 +138,7 @@ export default function Profile() {
                     <p><strong>Level:</strong> {displayedUser.level}</p>
                     <p><strong>About:</strong> {displayedUser.description || "Brak opisu"}</p>
                     {isMyProfile ? (
-                        <button className={styles.editBtn}>Edit Profile</button>
+                        <Link to={"../settings"}>Edit Profile</Link>
                     ) : (
                         <button className={styles.friendBtn}
                                 onClick={handleAddFriend}

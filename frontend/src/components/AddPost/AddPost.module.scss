@@ -1,0 +1,153 @@
+.container {
+  top: 50px;
+  left: 100px;
+  background: #fff;
+  position: fixed;
+  padding: 20px;
+  z-index: 4;
+
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  label {
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  input[type="time"],
+  select,
+  textarea {
+    padding: 8px;
+
+    font-size: 1rem;
+  }
+
+  textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+}
+
+.dateTimeRow {
+  display: flex;
+  gap: 10px;
+
+  input {
+    flex: 1;
+  }
+}
+
+.planButtons {
+  display: flex;
+  gap: 10px;
+
+
+  button {
+
+    padding: 5px 10px;
+    cursor: pointer;
+
+
+    &:hover {
+
+    }
+  }
+}
+
+.exerciseList {
+  height: 40px;
+  overflow-y: scroll;
+  border: 2px solid #000;
+
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .exerciseItem {
+    border: 2px solid #000;
+    border-radius: 20px;
+    padding: 5px 15px;
+    width: fit-content;
+    background: white;
+  }
+}
+
+.bottomRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.publicToggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  input[type="checkbox"] {
+    appearance: none;
+    width: 40px;
+    height: 20px;
+    background: #000;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    outline: none;
+
+    &:checked {
+      background: #00aaff; // Kolor błękitny z obrazka
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: 0.3s;
+    }
+
+    &:checked::before {
+      left: 22px;
+    }
+  }
+
+  label {
+    color: #00aaff;
+    margin: 0;
+  }
+}
+
+.postButton {
+  background: white;
+  border: 2px solid #000;
+  padding: 10px 30px;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover {
+    background: #000;
+    color: #fff;
+  }
+}

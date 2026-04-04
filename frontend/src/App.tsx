@@ -7,6 +7,7 @@ import Profile from "./scenes/Profile"
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import Settings from "./scenes/Settings/Settings.tsx";
 import Search from "./components/Search";
+import AddPost from "./components/AddPost";
 
 function App() {
     const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -52,6 +53,7 @@ function App() {
 
 
             <Search/>
+            <AddPost/>
             {showNavbar && <Navbar />}
 
             <Routes>
