@@ -8,6 +8,9 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import Settings from "./scenes/Settings/Settings.tsx";
 import Search from "./components/Search";
 import AddPost from "./components/AddPost";
+import Post from "./components/Posts";
+import Home from "./scenes/Home";
+
 
 function App() {
     const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -57,7 +60,12 @@ function App() {
             {showNavbar && <Navbar />}
 
             <Routes>
-
+                <Route path={"/"  }
+                       element={
+                            <Home/>
+                       } />
+                <Route path={"/goals"}
+                       element={<Post/>}/>
 
                 {/* Tutaj chronisz ścieżkę profilu */}
                 <Route

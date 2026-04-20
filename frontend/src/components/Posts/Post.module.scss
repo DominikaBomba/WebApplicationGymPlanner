@@ -1,0 +1,74 @@
+.feedContainer {
+  max-width: 1200px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 0 15px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.avatar{
+  width:80px;
+  border-radius: 100px;
+}
+.postCard {
+
+  flex: 1 1 calc(33.33% - 20px);
+  min-width: 300px;
+  max-width: 400px;
+
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .author {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 10px;
+
+    strong {
+      color: #333;
+      font-size: 1rem;
+    }
+  }
+
+  h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    color: #1a1a1a;
+  }
+
+  p {
+    margin: 0 0 15px 0;
+    color: #444;
+    line-height: 1.5;
+    flex-grow: 1;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+    font-size: 0.85rem;
+    color: #888;
+    font-weight: 500;
+
+
+  }
+}
