@@ -1,154 +1,117 @@
-
 import { createPost } from '../controllers/post.controller';
 import { validate } from '../middlewares/validate';
 import { createPostSchema } from '../schemas/post.schema';
 import { authenticate, AuthRequest } from '../middlewares/auth.middleware';
 import { Router, Response } from 'express';
 import { prisma } from '../db/prisma';
+
 const router = Router();
 router.post('/', authenticate, validate(createPostSchema), createPost);
 
 router.get('/all', authenticate, async (req: AuthRequest, res: Response) => {
     try {
-        const posts = await prisma.post.findMany({
-            where: {
-                isPublic: true
-            },
-            include: {
-                user: {
-                    select: {
-                        id: true,
-                        nickname: true,
-                        profilePicture: true
-                    }
-                },
-                gym: {
-                    select: {
-                        id: true,
-                        name: true,
-                        address: true,
-                        city: true,
-                        link: true,
-                         latitude: true,
-                         longitude: true
-                    }
-                }
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
-        });
+        const currentUserId = Number(req.user?.userId);
+        const { city, gymId, levels, durations, startDate, endDate, startTime, endTime, sort } = req.query;
 
-        if (!posts || posts.length === 0) {
-            return res.status(200).json([]);
+        const whereClause: any = { isPublic: true };
+
+        if (city) whereClause.gym = { city: { contains: String(city), mode: 'insensitive' } };
+        if (gymId) whereClause.gymId = Number(gymId);
+        if (levels) whereClause.user = { level: { in: String(levels).split(',') } };
+        if (durations) whereClause.trainingDuration = { in: String(durations).split(',') };
+
+        if (startDate || endDate) {
+            whereClause.date = {};
+            if (startDate) whereClause.date.gte = new Date(String(startDate));
+            if (endDate) whereClause.date.lte = new Date(String(endDate));
         }
 
-        return res.status(200).json(posts);
+        let orderByClause: any = { createdAt: 'desc' };
+        if (sort === 'soonest') orderByClause = { date: 'asc' };
+        else if (sort === 'latest') orderByClause = { date: 'desc' };
+        else if (sort === 'oldest') orderByClause = { createdAt: 'asc' };
+
+        let posts = await prisma.post.findMany({
+            where: whereClause,
+            include: {
+                user: {
+                    select: { id: true, nickname: true, profilePicture: true, level: true }
+                },
+                gym: {
+                    select: { id: true, name: true, address: true, city: true, link: true, latitude: true, longitude: true }
+                },
+                participants: {
+                    where: { participantId: currentUserId }
+                },
+                _count: {
+                    select: { participants: true }
+                }
+            },
+            orderBy: orderByClause
+        });
+
+        if (startTime || endTime) {
+            posts = posts.filter(post => {
+                const postTime = post.date.getHours() * 60 + post.date.getMinutes();
+                const start = startTime ? parseInt(String(startTime).split(':')[0]) * 60 + parseInt(String(startTime).split(':')[1]) : 0;
+                const end = endTime ? parseInt(String(endTime).split(':')[0]) * 60 + parseInt(String(endTime).split(':')[1]) : 1439;
+                return postTime >= start && postTime <= end;
+            });
+        }
+
+        return res.status(200).json(posts || []);
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: 'Błąd podczas pobierania postów użytkownika' });
+        return res.status(500).json({ error: 'Error fetching user posts' });
     }
 });
 
-// post.routes.ts
-
-router.get('/friends-feed', authenticate, async (req: AuthRequest, res: Response) => {
+router.post('/join_post', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const currentUserId = Number(req.user?.userId);
+        const { postId } = req.body;
 
-        // 1. Pobieramy relacje znajomości zalogowanego użytkownika
-        const friendships = await prisma.friends.findMany({
-            where: {
-                OR: [
-                    { userId: currentUserId },
-                    { friendId: currentUserId }
-                ]
-            }
+        if (!postId) return res.status(400).json({ error: "Post ID is required" });
+
+        const existingParticipant = await prisma.participants.findFirst({
+            where: { participantId: currentUserId, postId: Number(postId) }
         });
 
-        // 2. Tworzymy listę ID (znajomi + ja sam)
-        const friendIds = friendships.map(rel =>
-            rel.userId === currentUserId ? rel.friendId : rel.userId
-        );
-        const authorsToShow = [...friendIds, currentUserId];
+        if (existingParticipant) {
+            return res.status(400).json({ error: "You are already participating in this activity" });
+        }
 
-        // 3. Pobieramy posty tych osób
-        const posts = await prisma.post.findMany({
-            where: {
-                userId: { in: authorsToShow }
-            },
-            include: {
-                user: {
-                    select: { id: true, nickname: true, profilePicture: true }
-                },
-                gym: {
-                    select: { name: true, city: true }
-                }
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
+        const newParticipant = await prisma.participants.create({
+            data: { participantId: currentUserId, postId: Number(postId) }
         });
 
-        res.json(posts);
+        res.status(201).json({ message: "You signed up", participant: newParticipant });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "Błąd podczas pobierania tablicy znajomych" });
+        res.status(500).json({ error: "Error during adding you" });
     }
 });
 
-router.get('/:userId', authenticate, async (req: AuthRequest, res: Response) => {
+router.delete('/leave_post', authenticate, async (req: AuthRequest, res: Response) => {
     try {
-        const targetUserId = Number(req.params.userId);
+        const currentUserId = Number(req.user?.userId);
+        const { postId } = req.body;
 
-        if (isNaN(targetUserId)) {
-            return res.status(400).json({ error: 'Nieprawidłowy format ID użytkownika' });
-        }
-        else{
-            console.log("dalej")
-        }
+        if (!postId) return res.status(400).json({ error: "Post ID is required" });
 
-        const posts = await prisma.post.findMany({
-            where: {
-                userId: targetUserId,
-
-                // isPublic: true
-            },
-            include: {
-                user: {
-                    select: {
-                        id: true,
-                        nickname: true,
-                        profilePicture: true
-                    }
-                },
-                gym: {
-                    select: {
-                        id: true,
-                        name: true,
-                        address: true,
-                        city: true,
-                        link: true,
-                        latitude: true,
-                         longitude: true
-                    }
-                }
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
+        const deleteResult = await prisma.participants.deleteMany({
+            where: { participantId: currentUserId, postId: Number(postId) }
         });
 
-        if (!posts || posts.length === 0) {
-            return res.status(200).json([]); // Zwracamy pustą tablicę, jeśli brak postów
+        if (deleteResult.count === 0) {
+            return res.status(404).json({ error: "Nie byłeś zapisany na ten trening." });
         }
 
-        return res.status(200).json(posts);
+        res.status(200).json({ message: "Zrezygnowano z treningu" });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: 'Błąd podczas pobierania postów użytkownika' });
+        res.status(500).json({ error: "Błąd podczas wypisywania się z treningu" });
     }
 });
-
 
 export default router;
