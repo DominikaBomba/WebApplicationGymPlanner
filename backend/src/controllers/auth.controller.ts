@@ -72,8 +72,8 @@ export const loginUser = async (req: Request, res: Response) => {
             return res.status(401).json({ error: 'Invalid email or password.' });
         }
         const friendsList = [
-            ...user.friendsAdded.map(f => f.friend),
-            ...user.friendsOf.map(f => f.user)
+            ...user.friendsAdded.map((f: any) => f.friend),
+            ...user.friendsOf.map((f: any) => f.user)
         ];
         const isPasswordValid = await bcrypt.compare(password, user.password);
 

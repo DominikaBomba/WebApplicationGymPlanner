@@ -1,9 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
+// schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,6 +12,17 @@ enum Level {
   MID
   ADVANCED
   PRO
+}
+
+enum TrainingDuration {
+  LESS_THAN_1_HOUR
+  FROM_1_TO_2_HOURS
+  MORE_THAN_2_HOURS
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
 }
 
 model User {
@@ -35,10 +41,11 @@ model User {
 }
 
 model Friends {
-  id        Int      @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   userId    Int
   friendId  Int
-  createdAt DateTime @default(now())
+  createdAt DateTime     @default(now())
+  status    FriendStatus @default(ACCEPTED)
 
   user   User @relation("UserAddedFriend", fields: [userId], references: [id])
   friend User @relation("FriendAddedUser", fields: [friendId], references: [id])
@@ -49,6 +56,8 @@ model Friends {
 model Gym {
   id        Int     @id @default(autoincrement())
   name      String
+  city      String
+  address   String
   latitude  Float
   longitude Float
   link      String?
@@ -57,10 +66,17 @@ model Gym {
 }
 
 model Post {
-  id          Int    @id @default(autoincrement())
-  userId      Int
-  gymId       Int
-  description String
+  id               Int              @id @default(autoincrement())
+  userId           Int
+  gymId            Int
+  title            String
+  description      String
+  date             DateTime
+  trainingDuration TrainingDuration @default(FROM_1_TO_2_HOURS)
+  additionalInfo   String
+  isPublic         Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  maxParticipants  Int?
 
   user         User           @relation(fields: [userId], references: [id])
   gym          Gym            @relation(fields: [gymId], references: [id])
@@ -74,4 +90,6 @@ model Participants {
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   user User @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, participantId])
 }
