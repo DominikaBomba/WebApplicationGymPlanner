@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
+import { useUser } from '../context/UserContext';
+
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -13,6 +15,7 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, onToggleJoin }: PostCardProps) {
+    const { userData } = useUser();
     const [expanded, setExpanded] = useState(false);
 
     const postDate = new Date(post.date);
@@ -31,8 +34,9 @@ export default function PostCard({ post, onToggleJoin }: PostCardProps) {
     };
 
     const isParticipating = post.participants && post.participants.length > 0;
-
     const participantsCount = post._count?.participants || 0;
+
+    const isOwnPost = post.userId === userData?.id;
 
     return (
         <View style={styles.card}>
@@ -73,14 +77,21 @@ export default function PostCard({ post, onToggleJoin }: PostCardProps) {
                     </Text>
                 </View>
 
-                <TouchableOpacity
-                    style={[styles.joinButton, isParticipating && styles.leaveButton]}
-                    onPress={() => onToggleJoin && onToggleJoin(post.id, isParticipating)}
-                >
-                    <Text style={[styles.joinButtonText, isParticipating && styles.leaveButtonText]}>
-                        {isParticipating ? 'Leave' : 'Join Training'}
-                    </Text>
-                </TouchableOpacity>
+                {isOwnPost ? (
+                    <View style={styles.ownPostBadge}>
+                        <Ionicons name="star" size={14} color={Colors.primary} />
+                        <Text style={styles.ownPostText}>Your Post</Text>
+                    </View>
+                ) : (
+                    <TouchableOpacity
+                        style={[styles.joinButton, isParticipating && styles.leaveButton]}
+                        onPress={() => onToggleJoin && onToggleJoin(post.id, isParticipating)}
+                    >
+                        <Text style={[styles.joinButtonText, isParticipating && styles.leaveButtonText]}>
+                            {isParticipating ? 'Leave' : 'Join Training'}
+                        </Text>
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     );
@@ -114,4 +125,7 @@ const styles = StyleSheet.create({
     joinButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
     leaveButton: { backgroundColor: '#FFEBEE', borderWidth: 1, borderColor: '#ff4444' },
     leaveButtonText: { color: '#ff4444' },
+
+    ownPostBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF9E6', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 12, gap: 5 },
+    ownPostText: { color: Colors.primary, fontWeight: 'bold', fontSize: 14 },
 });

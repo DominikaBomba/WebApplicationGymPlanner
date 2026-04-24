@@ -28,7 +28,7 @@ router.get('/all', authenticate, async (req: AuthRequest, res: Response) => {
 
         let orderByClause: any = { createdAt: 'desc' };
         if (sort === 'soonest') orderByClause = { date: 'asc' };
-        else if (sort === 'latest') orderByClause = { date: 'desc' };
+        else if (sort === 'latest') orderByClause = { createdAt: 'desc' };
         else if (sort === 'oldest') orderByClause = { createdAt: 'asc' };
 
         let posts = await prisma.post.findMany({
@@ -72,6 +72,18 @@ router.post('/join_post', authenticate, async (req: AuthRequest, res: Response) 
         const { postId } = req.body;
 
         if (!postId) return res.status(400).json({ error: "Post ID is required" });
+
+        const targetPost = await prisma.post.findUnique({
+            where: { id: Number(postId) }
+        });
+
+        if (!targetPost) {
+            return res.status(404).json({ error: "Post not found" });
+        }
+
+        if (targetPost.userId === currentUserId) {
+            return res.status(400).json({ error: "You cannot join your own training session" });
+        }
 
         const existingParticipant = await prisma.participants.findFirst({
             where: { participantId: currentUserId, postId: Number(postId) }

@@ -5,12 +5,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { Colors } from '../../constants/Colors';
 import { API_URL } from '../../constants/api';
 import { useUser } from '../../context/UserContext';
 import PostCard from '../../components/PostCard';
 import SearchablePicker from '../../components/SearchablePicker';
+import FloatingActionButton from "@/components/FloatingActionButton";
 
 export default function AdsScreen() {
     const { userData } = useUser();
@@ -208,6 +210,8 @@ export default function AdsScreen() {
                 }
             />
 
+            <FloatingActionButton onPress={() => router.push('/add-post')} />
+
             {/* FILTER MODAL */}
             <Modal visible={filterModalVisible} animationType="slide" presentationStyle="pageSheet">
                 <SafeAreaView style={styles.modalContainer}>
@@ -388,5 +392,5 @@ const styles = StyleSheet.create({
     clearBtn: { flex: 1, padding: 15, alignItems: 'center', borderRadius: 12, borderWidth: 1 },
     clearBtnText: { fontWeight: 'bold' },
     applyBtn: { flex: 2, padding: 15, alignItems: 'center', backgroundColor: Colors.dark, borderRadius: 12 },
-    applyBtnText: { color: '#fff', fontWeight: 'bold' }
+    applyBtnText: { color: '#fff', fontWeight: 'bold' },
 });
