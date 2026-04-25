@@ -10,12 +10,12 @@ interface PostCarouselProps {
     title: string;
     posts: any[];
     onToggleJoin?: (postId: number, isParticipating: boolean) => void;
-    onAddPress?: () => void; // NOWOŚĆ: Funkcja wywoływana po kliknięciu "Add new post"
+    onAddPress?: () => void;
+    onDeletePost?: (postId: number) => void;
 }
 
-export default function PostCarousel({ title, posts, onToggleJoin, onAddPress }: PostCarouselProps) {
+export default function PostCarousel({ title, posts, onToggleJoin, onAddPress, onDeletePost }: PostCarouselProps) {
 
-    // Renderowanie kafelka dodawania na końcu listy
     const renderAddCard = () => {
         if (!onAddPress) return null;
         return (
@@ -42,10 +42,14 @@ export default function PostCarousel({ title, posts, onToggleJoin, onAddPress }:
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <View style={styles.cardWrapper}>
-                        <PostCard post={item} onToggleJoin={onToggleJoin} />
+                        <PostCard
+                            post={item}
+                            onToggleJoin={onToggleJoin}
+                            onDeletePress={onDeletePost}
+                        />
                     </View>
                 )}
-                // Dodajemy kafelek na końcu (lub jako jedyny, jeśli lista jest pusta)
+
                 ListFooterComponent={renderAddCard}
                 contentContainerStyle={styles.listContent}
             />
@@ -82,13 +86,12 @@ const styles = StyleSheet.create({
     },
     listContent: {
         //paddingHorizontal: 16,
-        paddingBottom: 10, // Lekki margines na dole na cienie PostCarda
+        paddingBottom: 10,
     },
     cardWrapper: {
         width: width * 0.80,
         marginRight: 16,
     },
-    // NOWE STYLE DLA "ADD CARD"
     addCard: {
         width: width * 0.85,
         marginRight: 16,
@@ -98,7 +101,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: 220, // Zapewnia wysokość zbliżoną do standardowego posta
+        minHeight: 220,
         backgroundColor: 'transparent',
     },
     addCardText: {

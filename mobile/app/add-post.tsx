@@ -16,7 +16,6 @@ export default function AddPostScreen() {
     const [loading, setLoading] = useState(false);
     const [gymsData, setGymsData] = useState<any[]>([]);
 
-    // --- FORM STATES ---
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [additionalInfo, setAdditionalInfo] = useState('');
@@ -33,7 +32,6 @@ export default function AddPostScreen() {
 
     const [errors, setErrors] = useState<any>({});
 
-    // 1. Fetch Gyms (Dla kaskadowego wyboru)
     const fetchGyms = async () => {
         try {
             const token = Platform.OS === 'web'
@@ -56,7 +54,6 @@ export default function AddPostScreen() {
         fetchGyms();
     }, []);
 
-    // --- HELPERS (Kaskadowe Listy) ---
     const uniqueCities = useMemo(() =>
             Array.from(new Set(gymsData.map(g => g.city))).sort(),
         [gymsData]);
@@ -65,11 +62,9 @@ export default function AddPostScreen() {
             selectedCity ? gymsData.filter(g => g.city === selectedCity) : gymsData,
         [selectedCity, gymsData]);
 
-    // --- SUBMIT LOGIC ---
     const handlePostSubmit = async () => {
         let newErrors: any = {};
 
-        // Walidacja inline
         if (!title || title.length < 3) newErrors.title = "Title must be at least 3 characters long.";
         if (!selectedGym) newErrors.gym = "Please select a location.";
         if (!description) newErrors.description = "Workout plan description is required.";
@@ -84,11 +79,9 @@ export default function AddPostScreen() {
         setLoading(true);
 
         try {
-            // Łączenie daty i godziny w jeden obiekt
             const dateTimeString = `${date}T${time}:00`;
             const finalDate = new Date(dateTimeString).toISOString();
 
-            // Parsowanie liczby uczestników (Puste = nielimitowane)
             const parsedMaxParticipants = parseInt(maxParticipants, 10);
             const participantsValue = (isNaN(parsedMaxParticipants) || parsedMaxParticipants <= 0) ? null : parsedMaxParticipants;
 
@@ -117,7 +110,6 @@ export default function AddPostScreen() {
             });
 
             if (response.ok) {
-                // Sukces - wracamy do poprzedniego ekranu
                 if (Platform.OS === 'web') {
                     window.alert("Workout posted successfully!");
                 } else {
@@ -247,7 +239,7 @@ export default function AddPostScreen() {
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 20 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <Text style={{ marginRight: 10, fontWeight: 'bold', color: isPublic ? Colors.primary : '#999' }}>
-                                {isPublic ? 'Public' : 'Private'}
+                                {isPublic ? 'Public' : 'Friends only'}
                             </Text>
                             <Switch
                                 value={isPublic}

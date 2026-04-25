@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, LayoutAnimation, Platform, UIManager } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, LayoutAnimation, Platform, UIManager, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 import { useUser } from '../context/UserContext';
-
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -12,9 +11,10 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 interface PostCardProps {
     post: any;
     onToggleJoin?: (postId: number, isParticipating: boolean) => void;
+    onDeletePress?: (postId: number) => void;
 }
 
-export default function PostCard({ post, onToggleJoin }: PostCardProps) {
+export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCardProps) {
     const { userData } = useUser();
     const [expanded, setExpanded] = useState(false);
 
@@ -33,9 +33,26 @@ export default function PostCard({ post, onToggleJoin }: PostCardProps) {
         setExpanded(!expanded);
     };
 
+    const handleDelete = () => {
+        if (Platform.OS === 'web') {
+            const confirmed = window.confirm("Are you sure you want to delete this training session?");
+            if (confirmed && onDeletePress) {
+                onDeletePress(post.id);
+            }
+        } else {
+            Alert.alert(
+                "Delete Post",
+                "Are you sure you want to delete this training session?",
+                [
+                    { text: "Cancel", style: "cancel" },
+                    { text: "Yes, delete", style: "destructive", onPress: () => onDeletePress && onDeletePress(post.id) }
+                ]
+            );
+        }
+    };
+
     const isParticipating = post.participants && post.participants.length > 0;
     const participantsCount = post._count?.participants || 0;
-
     const isOwnPost = post.userId === userData?.id;
 
     return (
@@ -48,7 +65,17 @@ export default function PostCard({ post, onToggleJoin }: PostCardProps) {
                         <Text style={styles.gymInfo}>{post.gym?.name}, {post.gym?.city}</Text>
                     </View>
                 </View>
-                <View style={styles.levelBadge}><Text style={styles.levelText}>{post.user?.level}</Text></View>
+
+                <View style={styles.levelContainer}>
+                    {isOwnPost && (
+                        <TouchableOpacity onPress={handleDelete} style={styles.deleteIcon}>
+                            <Ionicons name="trash-outline" size={20} color="#ff4444" />
+                        </TouchableOpacity>
+                    )}
+                    <View style={styles.levelBadge}>
+                        <Text style={styles.levelText}>{post.user?.level}</Text>
+                    </View>
+                </View>
             </View>
 
             <View style={styles.mainContent}>
@@ -71,8 +98,8 @@ export default function PostCard({ post, onToggleJoin }: PostCardProps) {
 
             <View style={styles.footer}>
                 <View style={styles.participantsBox}>
-                    <Ionicons name="people" size={18} color={isParticipating ? Colors.primary : "#999"} />
-                    <Text style={[styles.participantsText, isParticipating && styles.participatingText]}>
+                    <Ionicons name="people" size={18} color={(isParticipating || isOwnPost) ? Colors.primary : "#999"} />
+                    <Text style={[styles.participantsText, (isParticipating || isOwnPost) && styles.participatingText]}>
                         {participantsCount} / {post.maxParticipants || '∞'}
                     </Text>
                 </View>
@@ -80,19 +107,10 @@ export default function PostCard({ post, onToggleJoin }: PostCardProps) {
                 <View style={styles.actionArea}>
                     {isOwnPost ? (
                         <View style={styles.ownPostContainer}>
-                            {/* NOWOŚĆ: Privacy Badge */}
                             <View style={[styles.statusBadge, { marginRight: 8 }]}>
-                                <Ionicons
-                                    name={post.isPublic ? "eye-outline" : "lock-closed-outline"}
-                                    size={14}
-                                    color={post.isPublic ? Colors.primary : "#999"}
-                                />
-                                <Text style={[styles.statusText, { color: post.isPublic ? Colors.primary : "#999" }]}>
-                                    {post.isPublic ? 'Public' : 'Private'}
-                                </Text>
+                                <Ionicons name={post.isPublic ? "eye-outline" : "lock-closed-outline"} size={14} color={post.isPublic ? Colors.primary : "#999"} />
+                                <Text style={[styles.statusText, { color: post.isPublic ? Colors.primary : "#999" }]}>{post.isPublic ? 'Public' : 'Friends only'}</Text>
                             </View>
-
-                            {/* Your Post Badge */}
                             <View style={styles.ownPostBadge}>
                                 <Ionicons name="star" size={14} color={Colors.primary} />
                                 <Text style={styles.ownPostText}>Your Post</Text>
@@ -121,8 +139,12 @@ const styles = StyleSheet.create({
     avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 10, borderWidth: 1, borderColor: Colors.primary },
     nickname: { fontSize: 16, fontWeight: 'bold', color: Colors.dark },
     gymInfo: { fontSize: 12, color: '#888' },
+
+    levelContainer: { flexDirection: 'row', alignItems: 'center' },
+    deleteIcon: { marginRight: 10, padding: 4 },
     levelBadge: { backgroundColor: '#8C7A3C', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 },
     levelText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
+
     mainContent: { marginBottom: 12 },
     title: { fontSize: 18, fontWeight: 'bold', color: Colors.dark, marginBottom: 8 },
     detailsRow: { flexDirection: 'row', marginBottom: 10, gap: 15 },
@@ -137,45 +159,15 @@ const styles = StyleSheet.create({
     footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: Colors.border, paddingTop: 12 },
     participantsBox: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     participantsText: { fontSize: 14, color: '#666', fontWeight: '600' },
-    participatingText: { color: Colors.primary }, // Dodatkowe wyróźnienie
+    participatingText: { color: Colors.primary },
+    actionArea: { flexDirection: 'row', alignItems: 'center' },
+    ownPostContainer: { flexDirection: 'row', alignItems: 'center' },
+    statusBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F5F5F5', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, gap: 4, borderWidth: 1, borderColor: '#EEE' },
+    statusText: { fontSize: 12, fontWeight: '600' },
+    ownPostBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF9E6', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, gap: 5, borderWidth: 1, borderColor: '#FFE082' },
+    ownPostText: { color: Colors.primary, fontWeight: 'bold', fontSize: 13 },
     joinButton: { backgroundColor: Colors.dark, paddingHorizontal: 20, paddingVertical: 8, borderRadius: 12 },
     joinButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
     leaveButton: { backgroundColor: '#FFEBEE', borderWidth: 1, borderColor: '#ff4444' },
-    leaveButtonText: { color: '#ff4444' },
-
-    actionArea: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    ownPostContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    statusBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F5F5F5',
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 10,
-        gap: 4,
-        borderWidth: 1,
-        borderColor: '#EEE',
-    },
-    statusText: {
-        fontSize: 12,
-        fontWeight: '600',
-    },
-    ownPostBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#FFF9E6',
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 12,
-        gap: 5,
-        borderWidth: 1,
-        borderColor: '#FFE082',
-    },
-    ownPostText: { color: Colors.primary, fontWeight: 'bold', fontSize: 13 },
+    leaveButtonText: { color: '#ff4444' }
 });

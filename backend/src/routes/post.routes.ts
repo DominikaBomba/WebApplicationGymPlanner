@@ -68,11 +68,29 @@ router.get('/all', authenticate, async (req: AuthRequest, res: Response) => {
 
 router.get('/:userId', authenticate, async (req: AuthRequest, res: Response) => {
     try {
+        const currentUserId = Number(req.user?.userId);
         const targetUserId = Number(req.params.userId);
         if (isNaN(targetUserId)) return res.status(400).json({ error: 'Invalid Id format' });
 
+        const whereClause: any = { userId: targetUserId };
+
+        if (currentUserId !== targetUserId) {
+            const isFriend = await prisma.friends.findFirst({
+                where: {
+                    OR: [
+                        { userId: currentUserId, friendId: targetUserId },
+                        { userId: targetUserId, friendId: currentUserId }
+                    ]
+                }
+            });
+
+            if (!isFriend) {
+                whereClause.isPublic = true;
+            }
+        }
+
         const posts = await prisma.post.findMany({
-            where: { userId: targetUserId },
+            where: whereClause,
             include: {
                 user: { select: { id: true, nickname: true, profilePicture: true, level: true } },
                 gym: { select: { id: true, name: true, address: true, city: true, link: true, latitude: true, longitude: true } },

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
     View,
     Text,
@@ -8,11 +8,11 @@ import {
     Platform,
     TouchableOpacity,
     Modal,
-    ScrollView, FlatList, Image,
+    ScrollView, FlatList, Image, RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as SecureStore from 'expo-secure-store';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import CustomButton from '../../components/CustomButton';
 import { Colors } from '../../constants/Colors';
 import {API_URL} from "@/constants/api";
@@ -21,40 +21,50 @@ import {useUser} from "@/context/UserContext";
 import PostCarousel from '../../components/PostCarousel';
 
 export default function ProfileScreen(){
-    const { userData, loading, logout } = useUser();
+    const { userData, loading, logout, fetchUser } = useUser();
     const [friendsModalVisible, setFriendsModalVisible] = useState(false);
 
     const [myPosts, setMyPosts] = useState<any[]>([]);
     const [postsLoading, setPostsLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
-    useEffect(() => {
-        const fetchMyPosts = async () => {
-            if (!userData?.id) return;
-            try {
-                const token = Platform.OS === 'web'
-                    ? localStorage.getItem('userToken')
-                    : await SecureStore.getItemAsync('userToken');
+    const fetchMyPosts = useCallback(async () => {
+        if (!userData?.id) return;
+        try {
+            const token = Platform.OS === 'web'
+                ? localStorage.getItem('userToken')
+                : await SecureStore.getItemAsync('userToken');
 
-                const response = await fetch(`${API_URL}/api/posts/${userData.id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    // Sortowanie: najbliższe daty treningu na początku
-                    const sorted = data.sort((a: any, b: any) =>
-                        new Date(a.date).getTime() - new Date(b.date).getTime()
-                    );
-                    setMyPosts(sorted);
-                }
-            } catch (error) {
-                console.error("Error fetching user posts:", error);
-            } finally {
-                setPostsLoading(false);
+            const response = await fetch(`${API_URL}/api/posts/${userData.id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const sorted = data.sort((a: any, b: any) =>
+                    new Date(a.date).getTime() - new Date(b.date).getTime()
+                );
+                setMyPosts(sorted);
             }
-        };
+        } catch (error) {
+            console.error("Error fetching user posts:", error);
+        } finally {
+            setPostsLoading(false);
+            setRefreshing(false); // Kończymy animację odświeżania
+        }
+    }, [userData?.id]);
 
+    useFocusEffect(
+        useCallback(() => {
+            fetchMyPosts();
+        }, [fetchMyPosts])
+    );
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        fetchUser();
         fetchMyPosts();
-    }, [userData]);
+    }, [fetchUser, fetchMyPosts]);
 
     const handleLogout = async () => {
         await logout();
@@ -90,10 +100,34 @@ export default function ProfileScreen(){
         </TouchableOpacity>
     );
 
-    return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    const handleDeletePost = async (postId: number) => {
+        try {
+            const token = Platform.OS === 'web'
+                ? localStorage.getItem('userToken')
+                : await SecureStore.getItemAsync('userToken');
 
-            {/*profile*/}
+            const response = await fetch(`${API_URL}/api/posts/${postId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                setMyPosts(prev => prev.filter(p => p.id !== postId));
+            } else {
+                console.error("Error deleting post:", postId);
+            }
+        } catch (error) {
+            console.error("Delete error:", error);
+        }
+    };
+    return (
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={styles.scrollContent}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
+            }>
+
             <View style={styles.headerSection}>
                 <View style={styles.headerTopRow}>
                     <Image
@@ -131,18 +165,16 @@ export default function ProfileScreen(){
                 <PostCarousel
                     title="My training ads"
                     posts={myPosts}
-                    // Przekazujemy nawigację do formularza dodawania posta!
                     onAddPress={() => router.push('/add-post')}
+                    onDeletePost={handleDeletePost}
                 />
             )}
 
-            {/* Logout button */}
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                 <Ionicons name="log-out-outline" size={20} color={Colors.red} />
                 <Text style={styles.logoutText}>Log Out</Text>
             </TouchableOpacity>
 
-            {/* friends modal */}
             <Modal
                 visible={friendsModalVisible}
                 animationType="slide"
@@ -193,7 +225,6 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
 
-    // --- Profile Header ---
     headerSection: {
         backgroundColor: Colors.surface,
         padding: 20,
@@ -256,7 +287,6 @@ const styles = StyleSheet.create({
         marginLeft: 5,
     },
 
-    // --- Stats Row ---
     friendsRow: {
         flexDirection: 'row',
         alignItems: 'baseline',
@@ -284,7 +314,6 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
 
-    // --- Misc ---
     logoutButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -301,7 +330,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
 
-    // --- Modal Styles ---
+//modals
     modalContainer: {
         flex: 1,
         backgroundColor: Colors.background,

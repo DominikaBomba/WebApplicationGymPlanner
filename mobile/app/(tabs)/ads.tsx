@@ -22,7 +22,7 @@ export default function AdsScreen() {
     const [refreshing, setRefreshing] = useState(false);
     const [filterModalVisible, setFilterModalVisible] = useState(false);
 
-    // --- FILTER STATES ---
+    //filtry
     const [selectedCity, setSelectedCity] = useState<string | null>(null);
     const [selectedGym, setSelectedGym] = useState<any | null>(null);
     const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
@@ -33,7 +33,6 @@ export default function AdsScreen() {
     const [endTime, setEndTime] = useState('');
     const [selectedSort, setSelectedSort] = useState('soonest'); // 'soonest' or 'latest'
 
-    // 1. Fetch Gyms
     const fetchGyms = async () => {
         try {
             const token = Platform.OS === 'web'
@@ -52,7 +51,6 @@ export default function AdsScreen() {
         }
     };
 
-    // 2. Fetch Posts with Filters
     const fetchPosts = useCallback(async () => {
         try {
             const queryParams = new URLSearchParams();
@@ -92,7 +90,6 @@ export default function AdsScreen() {
                 ? localStorage.getItem('userToken')
                 : await SecureStore.getItemAsync('userToken');
 
-            // Wybieramy odpowiedni endpoint i metodę w zależności od stanu
             const endpoint = isParticipating ? '/api/posts/leave_post' : '/api/posts/join_post';
             const method = isParticipating ? 'DELETE' : 'POST';
 
@@ -106,16 +103,13 @@ export default function AdsScreen() {
             });
 
             if (response.ok) {
-                // Optimistic UI Update: Natychmiastowa aktualizacja lokalnego stanu
                 setPosts(prevPosts => prevPosts.map(post => {
                     if (post.id === postId) {
-                        // Obliczamy nową wartość _count
                         const currentCount = post._count?.participants || 0;
                         const newCount = isParticipating ? currentCount - 1 : currentCount + 1;
 
                         return {
                             ...post,
-                            // Dodajemy lub usuwamy atrapę z tablicy participants
                             participants: isParticipating ? [] : [{ participantId: userData.id }],
                             _count: { participants: newCount }
                         };
@@ -131,12 +125,33 @@ export default function AdsScreen() {
         }
     };
 
+    const handleDeletePost = async (postId: number) => {
+        try {
+            const token = Platform.OS === 'web'
+                ? localStorage.getItem('userToken')
+                : await SecureStore.getItemAsync('userToken');
+
+            const response = await fetch(`${API_URL}/api/posts/${postId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                setPosts(prev => prev.filter(p => p.id !== postId));
+            } else {
+                console.error("Błąd podczas usuwania");
+            }
+        } catch (error) {
+            console.error("Delete error:", error);
+        }
+    };
+
     useEffect(() => {
         fetchGyms();
         fetchPosts();
     }, [fetchPosts]);
 
-    // --- HELPERS ---
+    // helpers
     const uniqueCities = useMemo(() =>
             Array.from(new Set(gymsData.map(g => g.city))).sort(),
         [gymsData]);
@@ -160,7 +175,7 @@ export default function AdsScreen() {
         setStartTime(''); setEndTime('');
     };
 
-    const activeFiltersCount = (selectedCity ? 1 : 0) + selectedLevels.length + selectedDurations.length + (startDate ? 1 : 0);
+    const activeFiltersCount = (selectedCity ? 1 : 0) + (selectedGym ? 1 : 0) + selectedLevels.length + selectedDurations.length + ((startDate || endDate) ? 1 : 0) + ((startTime || endTime) ? 1 : 0);
 
     if (loading && !refreshing) {
         return (
@@ -172,9 +187,7 @@ export default function AdsScreen() {
 
     return (
         <SafeAreaView edges={['bottom']} style={styles.container}>
-            {/* FILTER & SORT BAR */}
             <View style={styles.topBar}>
-                {/* Left: Filter Button */}
                 <TouchableOpacity style={styles.filterBtn} onPress={() => setFilterModalVisible(true)}>
                     <Ionicons name="filter" size={18} color={Colors.dark} />
                     <Text style={styles.filterBtnText}>Filters</Text>
@@ -183,7 +196,6 @@ export default function AdsScreen() {
                     )}
                 </TouchableOpacity>
 
-                {/* Right: Sort Toggle */}
                 <View style={styles.sortContainer}>
                     <Text style={styles.sortLabel}>Sort by:</Text>
                     <TouchableOpacity
@@ -199,7 +211,7 @@ export default function AdsScreen() {
             <FlatList
                 data={posts}
                 keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => <PostCard post={item} onToggleJoin={handleToggleJoin}/>}
+                renderItem={({ item }) => <PostCard post={item} onToggleJoin={handleToggleJoin} onDeletePress={handleDeletePost}/>}
                 contentContainerStyle={styles.listContent}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchPosts(); }} tintColor={Colors.primary} />}
                 ListEmptyComponent={
@@ -212,7 +224,6 @@ export default function AdsScreen() {
 
             <FloatingActionButton onPress={() => router.push('/add-post')} />
 
-            {/* FILTER MODAL */}
             <Modal visible={filterModalVisible} animationType="slide" presentationStyle="pageSheet">
                 <SafeAreaView style={styles.modalContainer}>
                     <View style={styles.modalHeader}>
@@ -223,7 +234,6 @@ export default function AdsScreen() {
                     </View>
 
                     <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
-                        {/* LOCATION */}
                         <Text style={styles.label}>Location</Text>
                         <SearchablePicker<string>
                             data={uniqueCities}
@@ -245,7 +255,6 @@ export default function AdsScreen() {
                             searchPlaceholder="Search gym..."
                         />
 
-                        {/* LEVELS (Multi-select) */}
                         <Text style={styles.label}>Training Level</Text>
                         <View style={styles.rowChoices}>
                             {['BEGINNER', 'MID', 'ADVANCED', 'PRO'].map(lvl => (
@@ -259,7 +268,7 @@ export default function AdsScreen() {
                             ))}
                         </View>
 
-                        {/* DURATION (Multi-select) */}
+
                         <Text style={styles.label}>Training Duration</Text>
                         <View style={styles.rowChoices}>
                             {[
@@ -277,7 +286,6 @@ export default function AdsScreen() {
                             ))}
                         </View>
 
-                        {/* DATE RANGE */}
                         <Text style={styles.label}>Date Range (From - To)</Text>
                         <View style={styles.rangeRow}>
                             <TextInput
@@ -295,7 +303,6 @@ export default function AdsScreen() {
                             />
                         </View>
 
-                        {/* TIME RANGE */}
                         <Text style={styles.label}>Time Range (Between)</Text>
                         <View style={styles.rangeRow}>
                             <TextInput
