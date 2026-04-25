@@ -38,6 +38,7 @@ model User {
   friendsAdded Friends[]      @relation("UserAddedFriend")
   friendsOf    Friends[]      @relation("FriendAddedUser")
   participants Participants[]
+  trainingPlans TrainingPlan[]
 }
 
 model Friends {
@@ -78,9 +79,30 @@ model Post {
   createdAt        DateTime         @default(now())
   maxParticipants  Int?
 
+  trainingPlanId Int?
+   trainingPlan   TrainingPlan? @relation(fields: [trainingPlanId], references: [id])
+
   user         User           @relation(fields: [userId], references: [id])
   gym          Gym            @relation(fields: [gymId], references: [id])
   participants Participants[]
+}
+model TrainingPlan {
+  id          Int        @id @default(autoincrement())
+  title       String
+  authorId    Int
+  author      User       @relation(fields: [authorId], references: [id])
+  exercises   Exercise[]
+  posts       Post[]
+  createdAt   DateTime   @default(now())
+}
+
+model Exercise {
+  id             Int          @id @default(autoincrement())
+  name           String
+  reps           String
+  externalId     String?
+  planId         Int
+  trainingPlan   TrainingPlan @relation(fields: [planId], references: [id])
 }
 
 model Participants {

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import styles from './Profile.module.scss';
 import type {UserData} from "../../types/UserData.ts";
 import {Link} from "react-router";
+import PlanCreator from "../../components/PlanCreator"
 
 export default function Profile() {
     const { nickname } = useParams<{ nickname: string }>();
@@ -146,6 +147,7 @@ export default function Profile() {
                     )}
                 </div>
             </div>
+            <PlanCreator/>
         </div>
     );
 }

@@ -1,0 +1,145 @@
+.creatorContainer {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 25px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  font-family: sans-serif;
+}
+
+.header {
+  margin-top: 0;
+  color: #333;
+  text-align: center;
+}
+
+.section {
+  margin-bottom: 20px;
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+  }
+}
+
+.mainInput {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  font-size: 1rem;
+  &:focus { border-color: #007bff; outline: none; }
+}
+
+.searchWrapper {
+  position: relative;
+}
+
+.inputWithBtn {
+  display: flex;
+  gap: 10px;
+  input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #eee;
+    border-radius: 8px;
+  }
+}
+
+.addManualBtn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 0 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  &:disabled { opacity: 0.5; }
+}
+
+.dropdown {
+  position: absolute;
+  top: 105%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  z-index: 100;
+  max-height: 250px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    padding: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f9f9f9;
+    &:hover { background: #f0f7ff; }
+    span { color: #888; font-size: 0.8rem; margin-left: 5px; }
+  }
+}
+
+.exerciseList {
+  margin: 20px 0;
+  background: #fdfdfd;
+  border-radius: 10px;
+}
+
+.exerciseItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  &:last-child { border-bottom: none; }
+
+  .info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+  }
+
+  .name { font-weight: 500; min-width: 150px; }
+
+  .repsInput {
+    width: 100px;
+    padding: 5px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  color: #ff4d4d;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 10px;
+}
+
+.savePlanBtn {
+  width: 100%;
+  padding: 15px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+  &:disabled { background: #ccc; cursor: not-allowed; }
+  &:hover:not(:disabled) { background: #218838; }
+}
+
+.loader {
+  font-size: 0.8rem;
+  color: #007bff;
+  margin-top: 5px;
+}
