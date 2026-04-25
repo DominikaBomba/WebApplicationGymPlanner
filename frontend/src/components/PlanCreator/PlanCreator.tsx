@@ -1,7 +1,9 @@
 import  { useState, useEffect } from 'react';
 import styles from './PlanCreator.module.scss';
-
-export default function PlanCreator() {
+interface Props {
+    onSaved?: (planId: number) => void;
+}
+export default function PlanCreator({ onSaved }: Props){
     const [title, setTitle] = useState('');
     const [exercises, setExercises] = useState<any[]>([]);
     const [query, setQuery] = useState('');
@@ -20,25 +22,35 @@ export default function PlanCreator() {
 
         return () => clearTimeout(timer);
     }, [query]);
-
     const performSearch = async (searchTerm: string) => {
         setIsSearching(true);
         try {
             const response = await fetch(
-                `https://wger.de/api/v2/exerciseinfo/?name=${searchTerm}`
+                `https://wger.de/api/v2/exerciseinfo/?format=json&language=2&limit=20`
             );
             const data = await response.json();
 
-            console.log("Dane z Wger API:", data);
+            // Filtrujemy po nazwie po stronie klienta
+            const term = searchTerm.toLowerCase();
+            const mapped = (data.results || [])
+                .map((ex: any) => {
+                    // Szukamy angielskiego tłumaczenia (language=2)
+                    const translation = ex.translations?.find((t: any) => t.language === 2);
+                    return {
+                        name: translation?.name ?? null,
+                        id: ex.id,
+                        category: ex.category?.name ?? null,
+                    };
+                })
+                .filter((ex: any) => ex.name?.toLowerCase().includes(term));
 
-            setSuggestions(data.results || []);
+            setSuggestions(mapped);
         } catch (err) {
             console.error("Błąd API Wger:", err);
         } finally {
             setIsSearching(false);
         }
     };
-
     const addExercise = (item?: any) => {
         const newEx = {
 
@@ -78,6 +90,8 @@ export default function PlanCreator() {
             });
 
             if (response.ok) {
+                const data = await response.json();
+                onSaved?.(data.id);
                 alert("Plan został pomyślnie zapisany!");
                 setTitle('');
                 setExercises([]);
@@ -130,9 +144,8 @@ export default function PlanCreator() {
                         <ul className={styles.dropdown}>
                             {suggestions.map((s: any) => (
                                 <li key={s.id} onClick={() => addExercise(s)}>
-
                                     {s.name}
-                                    {s.category && <span className={styles.category}> ({s.category.name})</span>}
+                                    {s.category && <span className={styles.category}> ({s.category})</span>}
                                 </li>
                             ))}
                         </ul>

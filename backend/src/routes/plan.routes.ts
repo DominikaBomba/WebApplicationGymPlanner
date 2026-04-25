@@ -54,4 +54,36 @@ router.get('/my-plans', authenticate, async (req: AuthRequest, res: Response) =>
     }
 });
 
+router.get('/friends-plans', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = Number(req.user?.userId);
+
+        const friends = await prisma.friends.findMany({
+            where: {
+                OR: [
+                    { userId, status: 'ACCEPTED' },
+                    { friendId: userId, status: 'ACCEPTED' }
+                ]
+            }
+        });
+
+        const friendIds = friends.map(f => f.userId === userId ? f.friendId : f.userId);
+
+        if (friendIds.length === 0) return res.json([]);
+
+        const plans = await prisma.trainingPlan.findMany({
+            where: { authorId: { in: friendIds } },
+            include: {
+                exercises: true,
+                author: { select: { id: true, nickname: true } }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        res.json(plans);
+    } catch (error) {
+        res.status(500).json({ error: "Błąd podczas pobierania planów znajomych." });
+    }
+});
+
 export default router;

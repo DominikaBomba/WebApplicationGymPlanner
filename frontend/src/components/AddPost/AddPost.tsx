@@ -1,18 +1,20 @@
 import styles from "./AddPost.module.scss";
-import { useNavigate } from "react-router";
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import PlanCreator from "../PlanCreator/PlanCreator"; // dostosuj ścieżkę
 
 export enum TrainingDuration {
     LESS_THAN_1_HOUR = 'LESS_THAN_1_HOUR',
     FROM_1_TO_2_HOURS = 'FROM_1_TO_2_HOURS',
     MORE_THAN_2_HOURS = 'MORE_THAN_2_HOURS'
 }
+
 export default function AddPost() {
     const [isOpen, setIsOpen] = useState(false);
-
+    const [planMode, setPlanMode] = useState<'none' | 'pick' | 'create'>('none');
+    const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
     const queryClient = useQueryClient();
-    // Przykładowy stan dla prostych pól
+
     const [formData, setFormData] = useState({
         title: "",
         gymId: "",
@@ -25,6 +27,32 @@ export default function AddPost() {
         maxParticipants: ""
     });
 
+    const { data: myPlans = [] } = useQuery({
+        queryKey: ['plans', 'my'],
+        queryFn: async () => {
+            const token = localStorage.getItem('token');
+            const res = await fetch('http://localhost:3000/api/plans/my-plans', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return res.json();
+        },
+        enabled: planMode === 'pick'
+    });
+
+    const { data: friendsPlans = [] } = useQuery({
+        queryKey: ['plans', 'friends'],
+        queryFn: async () => {
+            const token = localStorage.getItem('token');
+            const res = await fetch('http://localhost:3000/api/plans/friends-plans', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            return res.json();
+        },
+        enabled: planMode === 'pick'
+    });
+
+    const allPlans = [...myPlans, ...friendsPlans];
+
     const { mutate, isPending } = useMutation({
         mutationFn: async (newPostData: any) => {
             const token = localStorage.getItem("token");
@@ -36,17 +64,17 @@ export default function AddPost() {
                 },
                 body: JSON.stringify(newPostData),
             });
-
             if (!response.ok) {
                 const errorData = await response.json();
                 throw errorData;
             }
-
             return response.json();
         },
         onSuccess: () => {
             alert("Post added successfully!");
             setIsOpen(false);
+            setPlanMode('none');
+            setSelectedPlanId(null);
             queryClient.invalidateQueries({ queryKey: ['posts'] });
         },
         onError: (err: any) => {
@@ -55,9 +83,7 @@ export default function AddPost() {
     });
 
     const handleSubmit = () => {
-        // Data i godzina ISO
         const combinedDateTime = new Date(`${formData.date}T${formData.time}:00`).toISOString();
-
         const participantsLimit = formData.maxParticipants === "" || parseInt(formData.maxParticipants) <= 0
             ? null
             : parseInt(formData.maxParticipants);
@@ -70,9 +96,12 @@ export default function AddPost() {
             trainingDuration: formData.trainingDuration,
             isPublic: formData.isPublic,
             additionalInfo: formData.additionalInfo,
-            maxParticipants: participantsLimit
+            maxParticipants: participantsLimit,
+            trainingPlanId: selectedPlanId ?? null
         });
     };
+
+    const selectedPlan = allPlans.find((p: any) => p.id === selectedPlanId);
 
     if (!isOpen) {
         return <button onClick={() => setIsOpen(true)}>Add Post</button>;
@@ -83,7 +112,6 @@ export default function AddPost() {
             <h2>Add post</h2>
 
             <div className={styles.formGrid}>
-
                 <div className={styles.column}>
                     <label>Title</label>
                     <input
@@ -129,21 +157,86 @@ export default function AddPost() {
 
                 <div className={styles.column}>
                     <label>Workout plan</label>
-                    {/*
-                    <div className={styles.planButtons}>
-                        <button type="button">create new +</button>
-                        <button type="button">choose from saved</button>
-                    </div>
 
-                    <div className={styles.exerciseList}>
-                        <div className={styles.exerciseItem}>pompki</div>
-                        <div className={styles.exerciseItem}>przysiady</div>
-                    </div>
-                       */}
+                    {/* Tryb: brak planu */}
+                    {planMode === 'none' && (
+                        <div className={styles.planButtons}>
+                            <button type="button" onClick={() => setPlanMode('pick')}>
+                                Wybierz zapisany plan
+                            </button>
+                            <button type="button" onClick={() => setPlanMode('create')}>
+                                Stwórz nowy +
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Tryb: wybór z listy */}
+                    {planMode === 'pick' && (
+                        <div>
+                            <select
+                                value={selectedPlanId ?? ''}
+                                onChange={(e) => setSelectedPlanId(Number(e.target.value))}
+                            >
+                                <option value="">-- wybierz plan --</option>
+                                {myPlans.length > 0 && (
+                                    <optgroup label="Moje plany">
+                                        {myPlans.map((p: any) => (
+                                            <option key={p.id} value={p.id}>{p.title}</option>
+                                        ))}
+                                    </optgroup>
+                                )}
+                                {friendsPlans.length > 0 && (
+                                    <optgroup label="Plany znajomych">
+                                        {friendsPlans.map((p: any) => (
+                                            <option key={p.id} value={p.id}>
+                                                {p.title} — {p.author.nickname}
+                                            </option>
+                                        ))}
+                                    </optgroup>
+                                )}
+                            </select>
+
+                            {selectedPlan && (
+                                <div className={styles.exerciseList}>
+                                    {selectedPlan.exercises.map((ex: any) => (
+                                        <div key={ex.id} className={styles.exerciseItem}>
+                                            <span>{ex.name}</span>
+                                            <span>{ex.reps}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            <button type="button" onClick={() => {
+                                setPlanMode('none');
+                                setSelectedPlanId(null);
+                            }}>
+                                Anuluj
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Tryb: tworzenie nowego */}
+                    {planMode === 'create' && (
+                        <div>
+                            <PlanCreator
+                                onSaved={(planId) => {
+                                    setSelectedPlanId(planId);
+                                    setPlanMode('pick');
+                                    queryClient.invalidateQueries({ queryKey: ['plans', 'my'] });
+                                }}
+                            />
+                            <button type="button" onClick={() => setPlanMode('none')}>
+                                Anuluj
+                            </button>
+                        </div>
+                    )}
+
+                    <label>Description</label>
                     <textarea
                         value={formData.description}
                         onChange={(e) => setFormData({...formData, description: e.target.value})}
-                        placeholder="Describe your workout plan..."
+                        placeholder="Describe your workout..."
                     />
                     <label>Additional info</label>
                     <textarea
@@ -178,6 +271,7 @@ export default function AddPost() {
                     </div>
                 </div>
             </div>
+
             <button style={{marginTop: "20px"}} onClick={() => setIsOpen(false)}>Anuluj</button>
         </div>
     );
