@@ -77,21 +77,38 @@ export default function PostCard({ post, onToggleJoin }: PostCardProps) {
                     </Text>
                 </View>
 
-                {isOwnPost ? (
-                    <View style={styles.ownPostBadge}>
-                        <Ionicons name="star" size={14} color={Colors.primary} />
-                        <Text style={styles.ownPostText}>Your Post</Text>
-                    </View>
-                ) : (
-                    <TouchableOpacity
-                        style={[styles.joinButton, isParticipating && styles.leaveButton]}
-                        onPress={() => onToggleJoin && onToggleJoin(post.id, isParticipating)}
-                    >
-                        <Text style={[styles.joinButtonText, isParticipating && styles.leaveButtonText]}>
-                            {isParticipating ? 'Leave' : 'Join Training'}
-                        </Text>
-                    </TouchableOpacity>
-                )}
+                <View style={styles.actionArea}>
+                    {isOwnPost ? (
+                        <View style={styles.ownPostContainer}>
+                            {/* NOWOŚĆ: Privacy Badge */}
+                            <View style={[styles.statusBadge, { marginRight: 8 }]}>
+                                <Ionicons
+                                    name={post.isPublic ? "eye-outline" : "lock-closed-outline"}
+                                    size={14}
+                                    color={post.isPublic ? Colors.primary : "#999"}
+                                />
+                                <Text style={[styles.statusText, { color: post.isPublic ? Colors.primary : "#999" }]}>
+                                    {post.isPublic ? 'Public' : 'Private'}
+                                </Text>
+                            </View>
+
+                            {/* Your Post Badge */}
+                            <View style={styles.ownPostBadge}>
+                                <Ionicons name="star" size={14} color={Colors.primary} />
+                                <Text style={styles.ownPostText}>Your Post</Text>
+                            </View>
+                        </View>
+                    ) : (
+                        <TouchableOpacity
+                            style={[styles.joinButton, isParticipating && styles.leaveButton]}
+                            onPress={() => onToggleJoin && onToggleJoin(post.id, isParticipating)}
+                        >
+                            <Text style={[styles.joinButtonText, isParticipating && styles.leaveButtonText]}>
+                                {isParticipating ? 'Leave' : 'Join Training'}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+                </View>
             </View>
         </View>
     );
@@ -126,6 +143,39 @@ const styles = StyleSheet.create({
     leaveButton: { backgroundColor: '#FFEBEE', borderWidth: 1, borderColor: '#ff4444' },
     leaveButtonText: { color: '#ff4444' },
 
-    ownPostBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF9E6', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 12, gap: 5 },
-    ownPostText: { color: Colors.primary, fontWeight: 'bold', fontSize: 14 },
+    actionArea: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    ownPostContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    statusBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F5F5F5',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 10,
+        gap: 4,
+        borderWidth: 1,
+        borderColor: '#EEE',
+    },
+    statusText: {
+        fontSize: 12,
+        fontWeight: '600',
+    },
+    ownPostBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFF9E6',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 12,
+        gap: 5,
+        borderWidth: 1,
+        borderColor: '#FFE082',
+    },
+    ownPostText: { color: Colors.primary, fontWeight: 'bold', fontSize: 13 },
 });

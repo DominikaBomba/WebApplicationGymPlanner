@@ -18,10 +18,43 @@ import { Colors } from '../../constants/Colors';
 import {API_URL} from "@/constants/api";
 import {Ionicons} from "@expo/vector-icons";
 import {useUser} from "@/context/UserContext";
+import PostCarousel from '../../components/PostCarousel';
 
 export default function ProfileScreen(){
     const { userData, loading, logout } = useUser();
     const [friendsModalVisible, setFriendsModalVisible] = useState(false);
+
+    const [myPosts, setMyPosts] = useState<any[]>([]);
+    const [postsLoading, setPostsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchMyPosts = async () => {
+            if (!userData?.id) return;
+            try {
+                const token = Platform.OS === 'web'
+                    ? localStorage.getItem('userToken')
+                    : await SecureStore.getItemAsync('userToken');
+
+                const response = await fetch(`${API_URL}/api/posts/${userData.id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    // Sortowanie: najbliższe daty treningu na początku
+                    const sorted = data.sort((a: any, b: any) =>
+                        new Date(a.date).getTime() - new Date(b.date).getTime()
+                    );
+                    setMyPosts(sorted);
+                }
+            } catch (error) {
+                console.error("Error fetching user posts:", error);
+            } finally {
+                setPostsLoading(false);
+            }
+        };
+
+        fetchMyPosts();
+    }, [userData]);
 
     const handleLogout = async () => {
         await logout();
@@ -91,6 +124,17 @@ export default function ProfileScreen(){
                     {userData?.description || "No bio provided..."}
                 </Text>
             </View>
+
+            {postsLoading ? (
+                <ActivityIndicator color={Colors.primary} style={{ marginVertical: 20 }} />
+            ) : (
+                <PostCarousel
+                    title="My training ads"
+                    posts={myPosts}
+                    // Przekazujemy nawigację do formularza dodawania posta!
+                    onAddPress={() => router.push('/add-post')}
+                />
+            )}
 
             {/* Logout button */}
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

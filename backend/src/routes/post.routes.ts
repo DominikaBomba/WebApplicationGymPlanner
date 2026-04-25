@@ -66,6 +66,28 @@ router.get('/all', authenticate, async (req: AuthRequest, res: Response) => {
     }
 });
 
+router.get('/:userId', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        const targetUserId = Number(req.params.userId);
+        if (isNaN(targetUserId)) return res.status(400).json({ error: 'Invalid Id format' });
+
+        const posts = await prisma.post.findMany({
+            where: { userId: targetUserId },
+            include: {
+                user: { select: { id: true, nickname: true, profilePicture: true, level: true } },
+                gym: { select: { id: true, name: true, address: true, city: true, link: true, latitude: true, longitude: true } },
+                participants: { where: { participantId: Number(req.user?.userId) } },
+                _count: { select: { participants: true } }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        return res.status(200).json(posts || []);
+    } catch (error) {
+        return res.status(500).json({ error: 'Error fetching user posts' });
+    }
+});
+
 router.post('/join_post', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const currentUserId = Number(req.user?.userId);
