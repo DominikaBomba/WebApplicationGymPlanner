@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import styles from './Post.module.scss';
+import {Link} from "react-router";
 
 interface PostProps {
     feedType: 'all' | 'friends';
@@ -94,14 +95,14 @@ export default function Post({ feedType }: PostProps) {
 
                     return (
                         <div key={post.id} className={styles.postCard}>
-                            <div className={styles.header}>
+                            <Link to={"../profile/"+ post.user.nickname} className={styles.header}>
                                 <img
                                     src={post.user.profilePicture || "/default-avatar.png"}
                                     className={styles.avatar}
                                     alt="profile"
                                 />
                                 <strong>{post.user.nickname}</strong>
-                            </div>
+                            </Link>
 
                             <h3>{post.title}</h3>
                             <p>{post.description}</p>

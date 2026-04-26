@@ -24,41 +24,13 @@ function App() {
     return (
         <>
 
-
-            { !token && (
-                <button
-                    className="registerBtn"
-                    onClick={() => {
-                        setAuthMode("register");
-                        setIsAuthOpen(true);
-                    }}
-                >
-                   Log In
-                </button>
-            )}
-            {isAuthOpen && (
-                <div className="login-overlay">
-                    {authMode === "login" ? (
-                        <Login
-                            onClose={() => setIsAuthOpen(false)}
-                            onSwitchToRegister={() => setAuthMode("register")}
-                        />
-                    ) : (
-                        <Register
-                            onClose={() => setIsAuthOpen(false)}
-                            onSwitchToLogin={() => setAuthMode("login")}
-                        />
-                    )}
-                </div>
-            )}
-
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=bar_chart_4_bars,home_app_logo,logout,man,notifications,settings"/>
 
 
-            <Search/>
-            <AddPost/>
-            {showNavbar && <Navbar />}
 
+
+            {showNavbar && <Navbar />}
+            <main className="content-wrapper">
             <Routes>
                 <Route path={"/"  }
                        element={
@@ -92,6 +64,8 @@ function App() {
                     }
                 />
             </Routes>
+
+            </main>
 
         </>
     )

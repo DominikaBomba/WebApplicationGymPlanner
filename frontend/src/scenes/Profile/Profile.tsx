@@ -147,7 +147,7 @@ export default function Profile() {
                     )}
                 </div>
             </div>
-            <PlanCreator/>
+
         </div>
     );
 }

@@ -53,3 +53,15 @@ font-family: 'Outfit', sans-serif;
      transform: translateY(0) scale(0.98);
    }
  }
+.content-wrapper {
+
+  margin-left: 100px;
+
+  margin-top: 70px;
+
+  padding: 50px;
+
+  box-sizing: border-box;
+
+  min-height: calc(100vh - 70px);
+}
