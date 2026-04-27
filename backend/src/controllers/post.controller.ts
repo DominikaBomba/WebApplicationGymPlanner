@@ -19,7 +19,8 @@ export const createPost = async(req: AuthRequest, res: Response) => {
             trainingDuration,
             additionalInfo,
             isPublic,
-            maxParticipants
+            maxParticipants,
+            trainingPlanId
         } = req.body;
 
         const gymExists = await prisma.gym.findUnique({
@@ -40,7 +41,8 @@ export const createPost = async(req: AuthRequest, res: Response) => {
                 trainingDuration,
                 additionalInfo,
                 isPublic,
-                maxParticipants
+                maxParticipants: maxParticipants ? Number(maxParticipants) : null,
+                trainingPlanId: trainingPlanId ? Number(trainingPlanId) : null, // POWIĄZANIE Z PLANEM
             }
         });
 

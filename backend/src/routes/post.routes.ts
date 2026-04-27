@@ -11,6 +11,8 @@ router.post('/', authenticate, validate(createPostSchema), createPost);
 router.get('/all', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const currentUserId = Number(req.user?.userId);
+       console.log("aaa----aa")
+        console.log(currentUserId);
         const { city, gymId, levels, durations, startDate, endDate, startTime, endTime, sort } = req.query;
 
         const whereClause: any = { isPublic: true };
@@ -65,7 +67,84 @@ router.get('/all', authenticate, async (req: AuthRequest, res: Response) => {
         return res.status(500).json({ error: 'Error fetching user posts' });
     }
 });
+router.get('/friends-feed', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        const currentUserId = Number(req.user?.userId);
 
+        const friendsRelations = await prisma.friends.findMany({
+            where: {
+                OR: [
+                    { userId: currentUserId },
+                    { friendId: currentUserId }
+                ]
+            }
+        });
+
+        const friendIds = friendsRelations.map(rel =>
+            rel.userId === currentUserId ? rel.friendId : rel.userId
+        );
+
+        const posts = await prisma.post.findMany({
+            where: {
+                userId: { in: friendIds }
+            },
+            include: {
+                user: { select: { id: true, nickname: true, profilePicture: true, level: true } },
+                gym: { select: { id: true, name: true, address: true, city: true } },
+                participants: { where: { participantId: currentUserId } },
+                _count: { select: { participants: true } }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        return res.status(200).json(posts);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Błąd pobierania postów znajomych' });
+    }
+});
+
+router.get('/details/:postId', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        const postId = Number(req.params.postId);
+        const currentUserId = Number(req.user?.userId);
+
+        if (isNaN(postId)) return res.status(400).json({ error: "Nieprawidłowe ID posta" });
+
+        const post = await prisma.post.findUnique({
+            where: { id: postId },
+            include: {
+                user: {
+                    select: { id: true, nickname: true, profilePicture: true, level: true }
+                },
+                gym: true,
+                trainingPlan: {
+                    include: {
+                        exercises: true // Pobieramy listę ćwiczeń wewnątrz planu
+                    }
+                },
+                participants: {
+                    include: {
+                        user: { select: { nickname: true, profilePicture: true } }
+                    }
+                },
+                _count: {
+                    select: { participants: true }
+                }
+            }
+        });
+
+        if (!post) return res.status(404).json({ error: "Post nie istnieje" });
+
+        // Opcjonalnie: Tutaj możesz dodać sprawdzenie, czy użytkownik ma prawo widzieć ten post
+        // (np. jeśli isPublic: false i nie są znajomymi)
+
+        return res.status(200).json(post);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Błąd serwera" });
+    }
+});
 router.get('/:userId', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const currentUserId = Number(req.user?.userId);
