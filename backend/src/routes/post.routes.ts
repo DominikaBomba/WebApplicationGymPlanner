@@ -67,6 +67,36 @@ router.get('/all', authenticate, async (req: AuthRequest, res: Response) => {
         return res.status(500).json({ error: 'Error fetching user posts' });
     }
 });
+
+router.get('/joined', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        const currentUserId = Number(req.user?.userId);
+
+        const posts = await prisma.post.findMany({
+            where: {
+                userId: { not: currentUserId },
+                participants: {
+                    some: {
+                        participantId: currentUserId
+                    }
+                }
+            },
+            include: {
+                user: { select: { id: true, nickname: true, profilePicture: true, level: true } },
+                gym: { select: { id: true, name: true, address: true, city: true, link: true, latitude: true, longitude: true } },
+                participants: { where: { participantId: currentUserId } },
+                _count: { select: { participants: true } }
+            },
+            orderBy: { date: 'asc' }
+        });
+
+        return res.status(200).json(posts || []);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error fetching posts joined by the user' });
+    }
+});
+
 router.get('/friends-feed', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const currentUserId = Number(req.user?.userId);

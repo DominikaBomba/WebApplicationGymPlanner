@@ -12,9 +12,10 @@ interface PostCarouselProps {
     onToggleJoin?: (postId: number, isParticipating: boolean) => void;
     onAddPress?: () => void;
     onDeletePost?: (postId: number) => void;
+    emptyMessage?: string;
 }
 
-export default function PostCarousel({ title, posts, onToggleJoin, onAddPress, onDeletePost }: PostCarouselProps) {
+export default function PostCarousel({ title, posts, onToggleJoin, onAddPress, onDeletePost, emptyMessage }: PostCarouselProps) {
 
     const renderAddCard = () => {
         if (!onAddPress) return null;
@@ -51,6 +52,13 @@ export default function PostCarousel({ title, posts, onToggleJoin, onAddPress, o
                 )}
 
                 ListFooterComponent={renderAddCard}
+                ListEmptyComponent={
+                    emptyMessage ? (
+                        <View style={styles.emptyContainer}>
+                            <Text style={styles.emptyText}>{emptyMessage}</Text>
+                        </View>
+                    ) : null
+                }
                 contentContainerStyle={styles.listContent}
             />
         </View>
@@ -109,5 +117,22 @@ const styles = StyleSheet.create({
         color: '#ccc',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    emptyContainer: {
+        width: width * 0.85,
+        minHeight: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        borderWidth: 1,
+        borderColor: Colors.border,
+        borderRadius: 20,
+        backgroundColor: Colors.surface,
+        borderStyle: 'dashed',
+    },
+    emptyText: {
+        color: '#999',
+        fontSize: 14,
+        textAlign: 'center',
     }
 });
