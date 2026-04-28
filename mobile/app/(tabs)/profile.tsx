@@ -50,7 +50,7 @@ export default function ProfileScreen(){
             console.error("Error fetching user posts:", error);
         } finally {
             setPostsLoading(false);
-            setRefreshing(false); // Kończymy animację odświeżania
+            setRefreshing(false);
         }
     }, [userData?.id]);
 
