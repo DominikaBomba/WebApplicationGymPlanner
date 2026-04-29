@@ -8,6 +8,7 @@ import * as SecureStore from 'expo-secure-store';
 import { Colors } from '../../constants/Colors';
 import { API_URL } from '../../constants/api';
 import { useUser } from '../../context/UserContext';
+import { toggleJoinTraining } from '../../services/postService';
 import PostCarousel from '../../components/PostCarousel';
 
 export default function UserProfileScreen() {
@@ -92,45 +93,20 @@ export default function UserProfileScreen() {
     };
 
     const handleToggleJoin = async (postId: number, isParticipating: boolean) => {
-        try {
-            const token = Platform.OS === 'web'
-                ? localStorage.getItem('userToken')
-                : await SecureStore.getItemAsync('userToken');
+        const success = await toggleJoinTraining(postId, isParticipating);
 
-            const endpoint = isParticipating ? '/api/posts/leave_post' : '/api/posts/join_post';
-            const method = isParticipating ? 'DELETE' : 'POST';
-
-            const response = await fetch(`${API_URL}${endpoint}`, {
-                method: method,
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ postId })
-            });
-
-            if (response.ok) {
-                setUserPosts(prevPosts => prevPosts.map(post => {
-                    if (post.id === postId) {
-                        const currentCount = post._count?.participants || 0;
-                        const newCount = isParticipating ? currentCount - 1 : currentCount + 1;
-
-                        return {
-                            ...post,
-                            participants: isParticipating ? [] : [{ participantId: userData?.id }],
-                            _count: { participants: newCount }
-                        };
-                    }
-                    return post;
-                }));
-            } else {
-                const errorData = await response.json();
-                console.error("Failed to toggle join:", errorData);
-                Alert.alert("Error", errorData.error || "Failed to join training.");
-            }
-        } catch (error) {
-            console.error("Error during join/leave API call:", error);
-            Alert.alert("Error", "Network error occurred.");
+        if (success) {
+            setUserPosts(prevPosts => prevPosts.map(post => {
+                if (post.id === postId) {
+                    const currentCount = post._count?.participants || 0;
+                    return {
+                        ...post,
+                        participants: isParticipating ? [] : [{ participantId: userData?.id }],
+                        _count: { participants: isParticipating ? currentCount - 1 : currentCount + 1 }
+                    };
+                }
+                return post;
+            }));
         }
     };
 

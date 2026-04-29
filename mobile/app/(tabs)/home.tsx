@@ -10,6 +10,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { Colors } from '../../constants/Colors';
 import { API_URL } from '../../constants/api';
 import { useUser } from '../../context/UserContext';
+import { toggleJoinTraining } from '../../services/postService';
 import PostCarousel from '../../components/PostCarousel';
 import FloatingActionButton from '../../components/FloatingActionButton';
 
@@ -70,51 +71,38 @@ export default function HomeScreen() {
     }, [loadAllFeeds]);
 
     const handleToggleJoin = async (postId: number, isParticipating: boolean) => {
-        try {
-            const token = Platform.OS === 'web'
-                ? localStorage.getItem('userToken')
-                : await SecureStore.getItemAsync('userToken');
+        const success = await toggleJoinTraining(postId, isParticipating);
 
-            const endpoint = isParticipating ? '/api/posts/leave_post' : '/api/posts/join_post';
-            const method = isParticipating ? 'DELETE' : 'POST';
-
-            const response = await fetch(`${API_URL}${endpoint}`, {
-                method,
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ postId })
+        if (success) {
+            const updateArray = (posts: any[]) => posts.map(post => {
+                if (post.id === postId) {
+                    const currentCount = post._count?.participants || 0;
+                    return {
+                        ...post,
+                        participants: isParticipating ? [] : [{ participantId: userData?.id }],
+                        _count: { participants: isParticipating ? currentCount - 1 : currentCount + 1 }
+                    };
+                }
+                return post;
             });
 
-            if (response.ok) {
+            setFriendsPosts(updateArray);
+
+            if (isParticipating) {
+                setJoinedPosts(prev => prev.filter(p => p.id !== postId));
+            } else {
                 const fullPost = [...joinedPosts, ...myPosts, ...friendsPosts].find(p => p.id === postId);
-
-                const updateArray = (posts: any[]) => posts.map(post => {
-                    if (post.id === postId) {
-                        const currentCount = post._count?.participants || 0;
-                        return {
-                            ...post,
-                            participants: isParticipating ? [] : [{ participantId: userData?.id }],
-                            _count: { participants: isParticipating ? currentCount - 1 : currentCount + 1 }
-                        };
-                    }
-                    return post;
-                });
-
-                setFriendsPosts(updateArray);
-
-                if (isParticipating) {
-                    setJoinedPosts(prev => prev.filter(p => p.id !== postId));
-                } else if (fullPost) {
+                if (fullPost) {
                     const joinedPost = {
                         ...fullPost,
                         participants: [{ participantId: userData?.id }],
                         _count: { participants: (fullPost._count?.participants || 0) + 1 }
                     };
-                    setJoinedPosts(prev => [...prev, joinedPost].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+                    setJoinedPosts(prev => [...prev, joinedPost].sort((a, b) =>
+                        new Date(a.date).getTime() - new Date(b.date).getTime()
+                    ));
                 }
-
             }
-        } catch (error) {
-            console.error("Error during join/leave:", error);
         }
     };
 
