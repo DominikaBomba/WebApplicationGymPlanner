@@ -83,9 +83,11 @@ export default function ProfileScreen(){
         <TouchableOpacity
             style={styles.friendCard}
             onPress={() => {
-                // Navigation to friends profile
-                console.log("Navigating to user ID:", item.id);
                 setFriendsModalVisible(false);
+                router.push({
+                    pathname: "/user/[nickname]",
+                    params: { nickname: item.nickname }
+                });
             }}
         >
             <Image

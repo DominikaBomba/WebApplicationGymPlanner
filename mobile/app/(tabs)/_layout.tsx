@@ -136,12 +136,13 @@ export default function TabsLayout() {
     );
 }
 
+// @ts-ignore
 const styles = StyleSheet.create({
     headerContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 45, paddingBottom: 15, backgroundColor: Colors.background, zIndex: 1000 },
     searchContainer: { flex: 1, marginRight: 15, position: 'relative', zIndex: 1000 },
     searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surface, borderRadius: 20, paddingHorizontal: 15, height: 40, borderWidth: 1, borderColor: Colors.border },
     searchIcon: { marginRight: 10 },
-    searchInput: { flex: 1, fontSize: 16, color: Colors.dark },
+    searchInput: { flex: 1, fontSize: 16, color: Colors.dark, outlineStyle: 'none'},
     dropdown: { position: 'absolute', top: 45, left: 0, right: 0, backgroundColor: Colors.surface, borderRadius: 15, borderWidth: 1, borderColor: Colors.border, maxHeight: 200, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 10, zIndex: 9999 },
     resultItem: { flexDirection: 'row', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
     resultAvatar: { width: 36, height: 36, borderRadius: 18, marginRight: 12 },

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, ActivityIndicator, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
@@ -131,13 +131,11 @@ export default function UserProfileScreen() {
 
     return (
         <SafeAreaView edges={['top']} style={styles.container}>
-            {/* Header Nawigacyjny */}
+            <Stack.Screen options={{ headerShown: false }} />
             <View style={styles.navHeader}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
                     <Ionicons name="arrow-back" size={24} color={Colors.dark} />
                 </TouchableOpacity>
-                <Text style={styles.navTitle}>Profile</Text>
-                <View style={{ width: 24 }} />
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -188,7 +186,7 @@ const styles = StyleSheet.create({
     centerContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background },
     errorText: { fontSize: 18, color: '#666' },
 
-    navHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 15, backgroundColor: Colors.background },
+    navHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingHorizontal: 20, paddingTop: 30, backgroundColor: Colors.background },
     backBtn: { padding: 5 },
     navTitle: { fontSize: 18, fontWeight: 'bold', color: Colors.dark },
     scrollContent: { padding: 20, paddingBottom: 40 },

@@ -187,6 +187,6 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.background,
     },
     scrollContent: {
-        paddingTop: 10,
+        paddingTop: 0,
     }
 });

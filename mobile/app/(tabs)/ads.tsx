@@ -324,10 +324,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 15,
-        backgroundColor: Colors.surface,
-        borderBottomWidth: 1,
-        borderBottomColor: Colors.border
+        paddingHorizontal: 16,
+        paddingTop: 4,
+        paddingBottom: 10,
+        backgroundColor: 'transparent',
     },
     filterBtn: {
         flexDirection: 'row',

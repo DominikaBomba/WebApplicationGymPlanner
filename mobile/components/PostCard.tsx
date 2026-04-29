@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, LayoutAnimation, Platform, UIManager, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, Modal, FlatList, ActivityIndicator, TouchableOpacity, LayoutAnimation, Platform, UIManager, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
+import { fetchPostParticipants, kickParticipant } from '../services/postService';
 import { useUser } from '../context/UserContext';
+import { router } from "expo-router";
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -17,6 +20,16 @@ interface PostCardProps {
 export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCardProps) {
     const { userData } = useUser();
     const [expanded, setExpanded] = useState(false);
+
+    const [participantsModalVisible, setParticipantsModalVisible] = useState(false);
+    const [participants, setParticipants] = useState<any[]>([]);
+    const [loadingParticipants, setLoadingParticipants] = useState(false);
+
+    const [localCount, setLocalCount] = useState<number>(post._count?.participants || 0);
+
+    useEffect(() => {
+        setLocalCount(post._count?.participants || 0);
+    }, [post._count?.participants]);
 
     const postDate = new Date(post.date);
     const formattedDate = postDate.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -46,6 +59,40 @@ export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCard
                 [
                     { text: "Cancel", style: "cancel" },
                     { text: "Yes, delete", style: "destructive", onPress: () => onDeletePress && onDeletePress(post.id) }
+                ]
+            );
+        }
+    };
+
+    const handleOpenParticipants = async () => {
+        setParticipantsModalVisible(true);
+        setLoadingParticipants(true);
+        const data = await fetchPostParticipants(post.id);
+        setParticipants(data);
+        setLoadingParticipants(false);
+    };
+
+    const executeKick = async (participant: any) => {
+        const success = await kickParticipant(post.id, participant.participantId);
+        if (success) {
+            setParticipants(prev => prev.filter(p => p.participantId !== participant.participantId));
+            setLocalCount(prevCount => prevCount - 1);
+        }
+    };
+
+    const handleKick = (participant: any) => {
+        if (Platform.OS === 'web') {
+            const confirmed = window.confirm(`Are you sure you want to remove ${participant.user.nickname} from this training?`);
+            if (confirmed) {
+                executeKick(participant);
+            }
+        } else {
+            Alert.alert(
+                "Remove Participant",
+                `Are you sure you want to remove ${participant.user.nickname} from this training?`,
+                [
+                    { text: "Cancel", style: "cancel" },
+                    { text: "Remove", style: "destructive", onPress: () => executeKick(participant) }
                 ]
             );
         }
@@ -97,18 +144,18 @@ export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCard
             </View>
 
             <View style={styles.footer}>
-                <View style={styles.participantsBox}>
+                <TouchableOpacity style={styles.participantsBox} onPress={handleOpenParticipants}>
                     <Ionicons name="people" size={18} color={(isParticipating || isOwnPost) ? Colors.primary : "#999"} />
                     <Text style={[styles.participantsText, (isParticipating || isOwnPost) && styles.participatingText]}>
-                        {participantsCount} / {post.maxParticipants || '∞'}
+                        {localCount} / {post.maxParticipants || '∞'}
                     </Text>
-                </View>
+                </TouchableOpacity>
 
                 <View style={styles.actionArea}>
                     {isOwnPost ? (
                         <View style={styles.ownPostContainer}>
                             <View style={[styles.statusBadge, { marginRight: 8 }]}>
-                                <Ionicons name={post.isPublic ? "eye-outline" : "lock-closed-outline"} size={14} color={post.isPublic ? Colors.primary : "#999"} />
+                                <Ionicons name={post.isPublic ? "earth-outline" : "people-outline"} size={14} color={post.isPublic ? Colors.primary : "#999"} />
                                 <Text style={[styles.statusText, { color: post.isPublic ? Colors.primary : "#999" }]}>{post.isPublic ? 'Public' : 'Friends only'}</Text>
                             </View>
                             <View style={styles.ownPostBadge}>
@@ -128,6 +175,60 @@ export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCard
                     )}
                 </View>
             </View>
+
+            <Modal
+                visible={participantsModalVisible}
+                animationType="slide"
+                presentationStyle="pageSheet"
+                onRequestClose={() => setParticipantsModalVisible(false)}
+            >
+                <SafeAreaView style={styles.modalContainer}>
+                    <View style={styles.modalHeader}>
+                        <Text style={styles.modalTitle}>Participants</Text>
+                        <TouchableOpacity onPress={() => setParticipantsModalVisible(false)} style={styles.closeButton}>
+                            <Ionicons name="close" size={24} color={Colors.dark} />
+                        </TouchableOpacity>
+                    </View>
+
+                    {loadingParticipants ? (
+                        <ActivityIndicator color={Colors.primary} style={{ marginTop: 50 }} />
+                    ) : (
+                        <FlatList
+                            data={participants}
+                            keyExtractor={(item) => item.id.toString()}
+                            contentContainerStyle={{ padding: 20 }}
+                            renderItem={({ item }) => (
+                                <View style={styles.friendCard}>
+                                    <TouchableOpacity
+                                        style={styles.friendInfoWrapper}
+                                        onPress={() => {
+                                            setParticipantsModalVisible(false);
+                                            router.push({ pathname: "/user/[nickname]", params: { nickname: item.user.nickname } });
+                                        }}
+                                    >
+                                        <Image source={{ uri: item.user.profilePicture || 'https://via.placeholder.com/150' }} style={styles.friendAvatar} />
+                                        <View style={styles.friendInfo}>
+                                            <Text style={styles.friendName}>{item.user.nickname}</Text>
+                                            <Text style={styles.friendLevel}>{item.user.level || 'BEGINNER'}</Text>
+                                        </View>
+                                    </TouchableOpacity>
+
+                                    {isOwnPost && item.participantId !== userData?.id ? (
+                                        <TouchableOpacity onPress={() => handleKick(item)} style={styles.kickBtn}>
+                                            <Ionicons name="trash-outline" size={20} color={Colors.red} />
+                                        </TouchableOpacity>
+                                    ) : (
+                                        <Ionicons name="chevron-forward" size={20} color="#ccc" />
+                                    )}
+                                </View>
+                            )}
+                            ListEmptyComponent={
+                                <Text style={styles.emptyText}>No one has joined yet.</Text>
+                            }
+                        />
+                    )}
+                </SafeAreaView>
+            </Modal>
         </View>
     );
 }
@@ -169,5 +270,46 @@ const styles = StyleSheet.create({
     joinButton: { backgroundColor: Colors.dark, paddingHorizontal: 20, paddingVertical: 8, borderRadius: 12 },
     joinButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
     leaveButton: { backgroundColor: '#FFEBEE', borderWidth: 1, borderColor: '#ff4444' },
-    leaveButtonText: { color: '#ff4444' }
+    leaveButtonText: { color: '#ff4444' },
+
+    modalContainer: { flex: 1, backgroundColor: Colors.background },
+    modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: Colors.border },
+    modalTitle: { fontSize: 20, fontWeight: 'bold' },
+    closeButton: { paddingHorizontal: 8 },
+    emptyText: { textAlign: 'center', marginTop: 40, color: '#999' },
+    kickBtn: { padding: 10 },
+
+    friendCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: Colors.surface,
+        padding: 15,
+        borderRadius: 16,
+        marginBottom: 10,
+    },
+    friendInfoWrapper: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    friendAvatar: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        marginRight: 15,
+    },
+    friendInfo: {
+        flex: 1,
+    },
+    friendName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: Colors.dark,
+    },
+    friendLevel: {
+        fontSize: 12,
+        color: '#8C7A3C',
+        marginTop: 2,
+        fontWeight: 'bold',
+    },
 });

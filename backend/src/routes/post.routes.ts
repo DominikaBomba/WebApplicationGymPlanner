@@ -275,6 +275,39 @@ router.delete('/leave_post', authenticate, async (req: AuthRequest, res: Respons
     }
 });
 
+router.delete('/kick_participant', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        const currentUserId = Number(req.user?.userId);
+        const { postId, participantId } = req.body;
+
+        if (!postId || !participantId) {
+            return res.status(400).json({ error: "Post ID and Participant ID are required" });
+        }
+
+        const post = await prisma.post.findUnique({
+            where: { id: Number(postId) }
+        });
+
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        if (post.userId !== currentUserId) {
+            return res.status(403).json({ error: "Only the author can remove participants from this training" });
+        }
+
+        await prisma.participants.deleteMany({
+            where: {
+                postId: Number(postId),
+                participantId: Number(participantId)
+            }
+        });
+
+        res.status(200).json({ message: "Participant has been removed from the training" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error during removing participant" });
+    }
+});
+
 router.delete('/:postId', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const currentUserId = Number(req.user?.userId);
