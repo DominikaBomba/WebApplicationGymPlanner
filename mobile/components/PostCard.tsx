@@ -20,6 +20,8 @@ interface PostCardProps {
 export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCardProps) {
     const { userData } = useUser();
     const [expanded, setExpanded] = useState(false);
+    const [loadingDetails, setLoadingDetails] = useState(false);
+    const [trainingPlan, setTrainingPlan] = useState<any>(null);
 
     const [participantsModalVisible, setParticipantsModalVisible] = useState(false);
     const [participants, setParticipants] = useState<any[]>([]);
@@ -41,8 +43,22 @@ export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCard
         'MORE_THAN_2_HOURS': '> 2h'
     };
 
-    const toggleExpand = () => {
+    const loadFullDetails = async () => {
+        const data = await fetchPostParticipants(post.id);
+        if (data) {
+            setParticipants(data.participants || []);
+            setTrainingPlan(data.trainingPlan || null);
+        }
+    };
+
+    const toggleExpand = async () => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+        if (!expanded && !trainingPlan) {
+            setLoadingDetails(true);
+            await loadFullDetails();
+            setLoadingDetails(false);
+        }
         setExpanded(!expanded);
     };
 
@@ -66,10 +82,11 @@ export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCard
 
     const handleOpenParticipants = async () => {
         setParticipantsModalVisible(true);
-        setLoadingParticipants(true);
-        const data = await fetchPostParticipants(post.id);
-        setParticipants(data);
-        setLoadingParticipants(false);
+        if (participants.length === 0 && !trainingPlan) {
+            setLoadingParticipants(true);
+            await loadFullDetails();
+            setLoadingParticipants(false);
+        }
     };
 
     const executeKick = async (participant: any) => {
@@ -99,7 +116,6 @@ export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCard
     };
 
     const isParticipating = post.participants && post.participants.length > 0;
-    const participantsCount = post._count?.participants || 0;
     const isOwnPost = post.userId === userData?.id;
 
     return (
@@ -119,9 +135,9 @@ export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCard
                             <Ionicons name="trash-outline" size={20} color="#ff4444" />
                         </TouchableOpacity>
                     )}
-                    <View style={styles.levelBadge}>
+                    <div style={styles.levelBadge}>
                         <Text style={styles.levelText}>{post.user?.level}</Text>
-                    </View>
+                    </div>
                 </View>
             </View>
 
@@ -132,14 +148,45 @@ export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCard
                     <View style={styles.detailItem}><Ionicons name="time-outline" size={16} color={Colors.primary} /><Text style={styles.detailText}>{formattedTime}</Text></View>
                     <View style={styles.detailItem}><Ionicons name="hourglass-outline" size={16} color={Colors.primary} /><Text style={styles.detailText}>{durationLabels[post.trainingDuration] || '1-2h'}</Text></View>
                 </View>
+
                 <Text style={styles.description} numberOfLines={expanded ? undefined : 3}>{post.description}</Text>
-                {(post.description.length > 100 || post.additionalInfo) && (
-                    <TouchableOpacity onPress={toggleExpand} style={styles.seeMoreBtn}>
-                        <Text style={styles.seeMoreText}>{expanded ? 'Show less' : 'See more...'}</Text>
-                    </TouchableOpacity>
-                )}
-                {expanded && post.additionalInfo && (
-                    <View style={styles.additionalInfoBox}><Text style={styles.additionalInfoTitle}>Additional Info:</Text><Text style={styles.additionalInfoText}>{post.additionalInfo}</Text></View>
+
+                <TouchableOpacity onPress={toggleExpand} style={styles.seeMoreBtn}>
+                    <Text style={styles.seeMoreText}>{expanded ? 'Show less' : 'See training plan & more...'}</Text>
+                    <Ionicons name={expanded ? "chevron-up" : "chevron-down"} size={14} color={Colors.primary} />
+                </TouchableOpacity>
+
+                {expanded && (
+                    <View style={styles.expandedSection}>
+                        {loadingDetails ? (
+                            <ActivityIndicator size="small" color={Colors.primary} style={{ marginVertical: 10 }} />
+                        ) : (
+                            <>
+                                {trainingPlan ? (
+                                    <View style={styles.planBox}>
+                                        <Text style={styles.planTitle}>
+                                            <Ionicons name="fitness" size={16} color={Colors.primary} /> Training Plan: {trainingPlan.name}
+                                        </Text>
+                                        {trainingPlan.exercises?.map((ex: any, index: number) => (
+                                            <View key={index} style={styles.exerciseRow}>
+                                                <Text style={styles.exerciseName}>{ex.name}</Text>
+                                                <Text style={styles.exerciseDetails}>{ex.sets} sets x {ex.reps} reps</Text>
+                                            </View>
+                                        ))}
+                                    </View>
+                                ) : (
+                                    <Text style={styles.noPlanText}>No specific training plan attached.</Text>
+                                )}
+
+                                {post.additionalInfo && (
+                                    <View style={styles.additionalInfoBox}>
+                                        <Text style={styles.additionalInfoTitle}>Additional Info:</Text>
+                                        <Text style={styles.additionalInfoText}>{post.additionalInfo}</Text>
+                                    </View>
+                                )}
+                            </>
+                        )}
+                    </View>
                 )}
             </View>
 
@@ -232,7 +279,6 @@ export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCard
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     card: { backgroundColor: Colors.surface, borderRadius: 20, padding: 16, marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 3 },
     header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
@@ -312,4 +358,45 @@ const styles = StyleSheet.create({
         marginTop: 2,
         fontWeight: 'bold',
     },
+    expandedSection: {
+        marginTop: 15,
+        borderTopWidth: 1,
+        borderTopColor: '#f0f0f0',
+        paddingTop: 10,
+    },
+    planBox: {
+        backgroundColor: '#f9f9f9',
+        borderRadius: 12,
+        padding: 12,
+        marginBottom: 10,
+    },
+    planTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: Colors.dark,
+        marginBottom: 8,
+    },
+    exerciseRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: 4,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    exerciseName: {
+        fontSize: 13,
+        color: '#333',
+        fontWeight: '500',
+    },
+    exerciseDetails: {
+        fontSize: 12,
+        color: '#666',
+    },
+    noPlanText: {
+        fontSize: 12,
+        color: '#999',
+        fontStyle: 'italic',
+        marginBottom: 10,
+    },
+
 });

@@ -47,7 +47,7 @@ export const fetchPostParticipants = async (postId: number): Promise<any[]> => {
 
         if (response.ok) {
             const data = await response.json();
-            return data.participants || [];
+            return data;
         }
         return [];
     } catch (error) {
