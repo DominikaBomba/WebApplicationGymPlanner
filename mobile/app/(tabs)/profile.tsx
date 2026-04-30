@@ -270,11 +270,9 @@ export default function ProfileScreen(){
                     title="My training plans"
                     plans={viewMode === 'all' ? myPlans : offlinePlans}
                     onDeletePlan={viewMode === 'all' ? handleDeletePlan : handleRemoveOfflinePlan}
-                    onAddPress={() => {
-                        setIsPlanCreatorVisible(true)
-                    }}
+                    onAddPress={viewMode === 'all' ? () => setIsPlanCreatorVisible(true) : undefined}
 
-                    emptyMessage={viewMode === 'all' ? "You haven't created any plans yet." : "No downloaded plans for offline use."}
+                    emptyMessage={viewMode === 'offline' ? "No downloaded plans for offline use." : undefined}
                     headerAction={<FilterToggle />}
                 />
             )}

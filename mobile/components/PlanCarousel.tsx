@@ -56,7 +56,7 @@ export default function PlanCarousel({ title, plans, onDeletePlan, onDownloadPla
                 )}
                 ListFooterComponent={renderAddCard}
                 ListEmptyComponent={
-                    emptyMessage ? (
+                    (emptyMessage && !onAddPress) ? (
                         <View style={styles.emptyContainer}>
                             <Text style={styles.emptyText}>{emptyMessage}</Text>
                         </View>
