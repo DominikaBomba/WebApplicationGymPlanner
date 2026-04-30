@@ -20,6 +20,7 @@ import {Ionicons} from "@expo/vector-icons";
 import {useUser} from "@/context/UserContext";
 import PostCarousel from '../../components/PostCarousel';
 import PlanCarousel from '../../components/PlanCarousel';
+import PlanCreatorModal from '../../components/PlanCreatorModal';
 import PlanCard from "@/components/PlanCard";
 import { getOfflinePlans, removePlanOffline } from '../../services/localDatabase';
 
@@ -36,6 +37,7 @@ export default function ProfileScreen(){
     const [refreshing, setRefreshing] = useState(false);
 
     const [viewMode, setViewMode] = useState<'all' | 'offline'>('all');
+    const [isPlanCreatorVisible, setIsPlanCreatorVisible] = useState(false);
 
     const loadOfflinePlans = async () => {
         const plans = await getOfflinePlans();
@@ -268,10 +270,23 @@ export default function ProfileScreen(){
                     title="My training plans"
                     plans={viewMode === 'all' ? myPlans : offlinePlans}
                     onDeletePlan={viewMode === 'all' ? handleDeletePlan : handleRemoveOfflinePlan}
+                    onAddPress={() => {
+                        setIsPlanCreatorVisible(true)
+                    }}
+
                     emptyMessage={viewMode === 'all' ? "You haven't created any plans yet." : "No downloaded plans for offline use."}
                     headerAction={<FilterToggle />}
                 />
             )}
+
+            <PlanCreatorModal
+                visible={isPlanCreatorVisible}
+                onClose={() => setIsPlanCreatorVisible(false)}
+                onSaved={(newPlanId) => {
+                    setIsPlanCreatorVisible(false);
+                    fetchMyPlans();
+                }}
+            />
 
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                 <Ionicons name="log-out-outline" size={20} color={Colors.red} />
@@ -380,6 +395,7 @@ const styles = StyleSheet.create({
         fontSize: 10,
         fontWeight: 'bold',
         textTransform: 'uppercase',
+        marginHorizontal: 5,
     },
     bioText: {
         fontSize: 15,

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, FlatList, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import PlanCard from './PlanCard';
 import { Colors } from '../constants/Colors';
+import {Ionicons} from "@expo/vector-icons";
 
 const { width } = Dimensions.get('window');
 
@@ -10,11 +11,23 @@ interface PlanCarouselProps {
     plans: any[];
     onDeletePlan?: (planId: number) => void;
     onDownloadPlan?: (plan: any) => void;
+    onAddPress?: () => void;
     emptyMessage?: string;
     headerAction?: React.ReactNode;
 }
 
-export default function PlanCarousel({ title, plans, onDeletePlan, onDownloadPlan, emptyMessage, headerAction }: PlanCarouselProps) {
+export default function PlanCarousel({ title, plans, onDeletePlan, onDownloadPlan, onAddPress, emptyMessage, headerAction }: PlanCarouselProps) {
+    const renderAddCard = () => {
+        if (!onAddPress) return null;
+
+        return (
+            <TouchableOpacity style={styles.addCard} onPress={onAddPress}>
+                <Ionicons name="add" size={48} color="#ccc" />
+                <Text style={styles.addCardText}>Create new plan</Text>
+            </TouchableOpacity>
+        );
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -41,6 +54,7 @@ export default function PlanCarousel({ title, plans, onDeletePlan, onDownloadPla
                         />
                     </View>
                 )}
+                ListFooterComponent={renderAddCard}
                 ListEmptyComponent={
                     emptyMessage ? (
                         <View style={styles.emptyContainer}>
@@ -109,5 +123,24 @@ const styles = StyleSheet.create({
         color: '#999',
         fontSize: 14,
         textAlign: 'center',
-    }
+    },
+    addCard: {
+        width: width * 0.80,
+        marginRight: 16,
+        marginBottom: 16,
+        borderWidth: 2,
+        borderColor: '#ccc',
+        borderStyle: 'dashed',
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: 140,
+        backgroundColor: 'transparent',
+    },
+    addCardText: {
+        marginTop: 10,
+        color: '#ccc',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 });

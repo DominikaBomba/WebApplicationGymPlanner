@@ -11,6 +11,7 @@ import * as SecureStore from 'expo-secure-store';
 import { Colors } from '../constants/Colors';
 import { API_URL } from '../constants/api';
 import SearchablePicker from '../components/SearchablePicker';
+import PlanCreatorModal from "@/components/PlanCreatorModal";
 
 interface PlanCreatorModalProps {
     visible: boolean;
@@ -19,12 +20,7 @@ interface PlanCreatorModalProps {
 }
 
 export default function AddPostScreen() {
-    const [planTitle, setPlanTitle] = useState('');
-    const [exercises, setExercises] = useState<any[]>([]);
-    const [query, setQuery] = useState('');
-    const [suggestions, setSuggestions] = useState<any[]>([]);
-    const [isSearching, setIsSearching] = useState(false);
-    const [isSavingPlan, setIsSavingPlan] = useState(false);
+
     const [loading, setLoading] = useState(false);
     const [gymsData, setGymsData] = useState<any[]>([]);
 
@@ -67,17 +63,7 @@ export default function AddPostScreen() {
             if (myPlansRes.ok) allPlans = [...allPlans, ...(await myPlansRes.json())];
             if (friendsPlansRes.ok) allPlans = [...allPlans, ...(await friendsPlansRes.json())];
             setPlansData(allPlans);
-            /*
-            if (gymsRes.ok) {setGymsData(await gymsRes.json())}
-            else{console.log("here error")}
-            const response = await fetch(`${API_URL}/api/gyms`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
 
-            if (response.ok) {
-                const data = await response.json();
-                setGymsData(data);
-            }*/
         } catch (error) {
             console.error("Error fetching gyms:", error);
         }
@@ -96,7 +82,6 @@ export default function AddPostScreen() {
         [selectedCity, gymsData]);
 
     const handlePostSubmit = async () => {
-        console.log("DEBUG: Wysyłam post. Aktualne selectedPlanId w stanie:", selectedPlanId);
         let newErrors: any = {};
 
         if (!title || title.length < 3) newErrors.title = "Title must be at least 3 characters long.";
@@ -163,60 +148,8 @@ export default function AddPostScreen() {
             setLoading(false);
         }
     };
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (query.trim().length > 2) performSearch(query);
-            else setSuggestions([]);
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [query]);
-    const performSearch = async (searchTerm: string) => {
-        setIsSearching(true);
-        try {
-            const response = await fetch(`https://wger.de/api/v2/exerciseinfo/?format=json&language=2&limit=50`);
-            const data = await response.json();
-            const term = searchTerm.toLowerCase();
-            const mapped = (data.results || [])
-                .map((ex: any) => ({
-                    name: ex.translations?.find((t: any) => t.language === 2)?.name ?? ex.name,
-                    id: ex.id,
-                }))
-                .filter((ex: any) => ex.name?.toLowerCase().includes(term))
-                .slice(0, 10);
-            setSuggestions(mapped);
-        } catch (err) { console.log(err); }
-        finally { setIsSearching(false); }
-    };
 
-    const addExercise = (item?: any) => {
-        setExercises([...exercises, { name: item ? item.name : query, reps: "3x12" }]);
-        setQuery('');
-        setSuggestions([]);
-    };
-    const handleSavePlan = async () => {
-        if (!planTitle.trim() || exercises.length === 0) {
-            Alert.alert("Błąd", "Podaj nazwę planu i dodaj ćwiczenia.");
-            return;
-        }
-        setIsSavingPlan(true);
-        try {
-            const token = Platform.OS === 'web' ? localStorage.getItem('userToken') : await SecureStore.getItemAsync('userToken');
-            const response = await fetch(`${API_URL}/api/plans`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ title: planTitle, exercises })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setSelectedPlanId(data.id);
-                console.log("DEBUG: selectedPlanId ustawione na:", data.id);
-                fetchGyms();
-                setIsCreatorVisible(false);
-                setPlanTitle(''); setExercises([]);
-            }
-        } catch (e) { Alert.alert("Błąd", "Nie udało się zapisać planu."); }
-        finally { setIsSavingPlan(false); }
-    };
+
     return (
         <SafeAreaView edges={['bottom']} style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
@@ -377,98 +310,15 @@ export default function AddPostScreen() {
                     )}
                 </TouchableOpacity>
             </View>
-            <Modal visible={isCreatorVisible} animationType="slide" presentationStyle="pageSheet">
-                <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-                    <View style={styles.modalHeader}>
-                        <TouchableOpacity onPress={() => setIsCreatorVisible(false)}>
-                            <Ionicons name="close" size={28} color={Colors.dark} />
-                        </TouchableOpacity>
-
-                        <Text style={styles.modalTitle}>New Training Plan</Text>
-
-
-                        <TouchableOpacity
-                            onPress={handleSavePlan}
-                            disabled={isSavingPlan}
-                        >
-                            {isSavingPlan ? (
-                                <ActivityIndicator size="small" color={Colors.primary} />
-                            ) : (
-                                <Text style={styles.saveActionText}>Save</Text>
-                            )}
-                        </TouchableOpacity>
-                    </View>
-
-                    <ScrollView style={{ padding: 20 }} keyboardShouldPersistTaps="always">
-                        <Text style={styles.label}>Plan Name</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={planTitle}
-                            onChangeText={setPlanTitle}
-                            placeholder="e.g. Monday Leg Day"
-                        />
-
-                        <Text style={styles.label}>Add Exercise</Text>
-                        <View style={{ flexDirection: 'row', gap: 10, marginBottom: 5 }}>
-                            <TextInput
-                                style={[styles.input, { flex: 1 }]}
-                                value={query}
-                                onChangeText={setQuery}
-                                placeholder="Search exercises..."
-                            />
-                            {query.length > 0 && (
-                                <TouchableOpacity
-                                    style={{ backgroundColor: Colors.dark, padding: 12, borderRadius: 12, justifyContent: 'center' }}
-                                    onPress={() => addExercise()}
-                                >
-                                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold' }}>+ Own</Text>
-                                </TouchableOpacity>
-                            )}
-                        </View>
-
-                        {/* Sugestie z API */}
-                        {isSearching && <ActivityIndicator color={Colors.primary} style={{ margin: 10 }} />}
-                        {suggestions.map((s) => (
-                            <TouchableOpacity
-                                key={s.id}
-                                style={styles.suggestionItem}
-                                onPress={() => addExercise(s)}
-                            >
-                                <Text>{s.name}</Text>
-                                <Ionicons name="add-circle-outline" size={22} color={Colors.primary} />
-                            </TouchableOpacity>
-                        ))}
-
-                        <View style={{ height: 20 }} />
-
-                        <Text style={styles.label}>Selected Exercises ({exercises.length})</Text>
-                        {exercises.map((ex, index) => (
-                            <View key={index} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#f9f9f9', padding: 15, borderRadius: 12, marginBottom: 10 }}>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={{ fontWeight: 'bold' }}>{ex.name}</Text>
-                                    <TextInput
-                                        style={styles.repsInput}
-                                        value={ex.reps}
-                                        onChangeText={(val) => {
-                                            const updated = [...exercises];
-                                            updated[index].reps = val;
-                                            setExercises(updated);
-                                        }}
-                                    />
-                                </View>
-
-                                <TouchableOpacity onPress={() => {
-                                    const updated = exercises.filter((_, i) => i !== index);
-                                    setExercises(updated);
-                                }}>
-                                    <Ionicons name="trash-outline" size={22} color="#ff4444" />
-                                </TouchableOpacity>
-                            </View>
-                        ))}
-                       <View style={{ height: 100 }} />
-                    </ScrollView>
-                </SafeAreaView>
-            </Modal>
+            <PlanCreatorModal
+                visible={isCreatorVisible}
+                onClose={() => setIsCreatorVisible(false)}
+                onSaved={(newPlanId) => {
+                    setIsCreatorVisible(false);
+                    setSelectedPlanId(newPlanId);
+                    fetchGyms();
+                }}
+            />
         </SafeAreaView>
 
     );

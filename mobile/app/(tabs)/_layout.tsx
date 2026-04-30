@@ -130,7 +130,7 @@ export default function TabsLayout() {
             <Tabs.Screen name="home" options={{ tabBarIcon: ({ color, focused }) => (<View style={[styles.iconWrapper, focused && styles.activeIcon]}><Ionicons name="home" size={24} color={color} /></View>) }} />
             <Tabs.Screen name="profile" options={{ tabBarIcon: ({ color, focused }) => (<View style={[styles.iconWrapper, focused && styles.activeIcon]}><Ionicons name="person" size={24} color={color} /></View>) }} />
             <Tabs.Screen name="ads" options={{ tabBarIcon: ({ color, focused }) => (<View style={[styles.iconWrapper, focused && styles.activeIcon]}><Ionicons name="barbell" size={24} color={color} /></View>) }} />
-            <Tabs.Screen name="plans" options={{ tabBarIcon: ({ color, focused }) => (<View style={[styles.iconWrapper, focused && styles.activeIcon]}><Ionicons name="chatbubble" size={24} color={color} /></View>) }} />
+            <Tabs.Screen name="statsScreen" options={{ tabBarIcon: ({ color, focused }) => (<View style={[styles.iconWrapper, focused && styles.activeIcon]}><Ionicons name="stats-chart" size={24} color={color} /></View>) }} />
             <Tabs.Screen name="settings" options={{ tabBarIcon: ({ color, focused }) => (<View style={[styles.iconWrapper, focused && styles.activeIcon]}><Ionicons name="settings" size={24} color={color} /></View>) }} />
         </Tabs>
     );

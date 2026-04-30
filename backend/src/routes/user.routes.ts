@@ -61,7 +61,6 @@ router.get('/me', authenticate, async (req: AuthRequest, res: Response) => {
 router.get("/:nickname", authenticate, async (req: AuthRequest, res: Response) => {
     try{
         const targetUsername = String(req.params.nickname);
-     //   console.log(targetUsername);
         const user  = await prisma.user.findMany({
             where: {
                 nickname: {
@@ -79,7 +78,6 @@ router.get("/:nickname", authenticate, async (req: AuthRequest, res: Response) =
 
             }
         });
-        console.log(user);
         if (!user) return res.status(404).json({ error: "Użytkownik nie istnieje" });
 
         res.json(user);
@@ -129,9 +127,7 @@ router.get("/friends/:nickname", authenticate, async (req: AuthRequest, res: Res
         });
 
         res.json(friendsList);
-        console.log(friendsList)
     } catch (error) {
-        //console.error(error);
         res.status(500).json({ error: "Błąd serwera" });
     }
 });
@@ -175,7 +171,6 @@ router.patch('/update', authenticate, async (req: AuthRequest, res: Response) =>
     try{
         const userId = Number(req.user?.userId);
         const {level, description, profilePicture} = req.body;
-        console.log(level);
         const updateUser = await prisma.user.update({
             where: { id: userId },
             data: {

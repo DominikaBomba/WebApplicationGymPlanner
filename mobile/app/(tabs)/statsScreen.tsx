@@ -26,8 +26,6 @@ export default function StatsScreen() {
                 ? localStorage.getItem('userToken')
                 : await SecureStore.getItemAsync('userToken');
 
-            console.log("MY TOKEN:", token);
-
             const response = await fetch(`${API_URL}/api/stats/summary`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });

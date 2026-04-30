@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     headerTextInfo: { flexDirection: 'column', alignItems: 'baseline', justifyContent: 'center', marginBottom: 15, flex: 1 },
     nameText: { fontSize: 24, fontWeight: 'bold', color: Colors.dark, marginBottom: 3 },
     badge: { backgroundColor: '#8C7A3C', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, marginBottom: 10 },
-    badgeText: { color: Colors.surface, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase' },
+    badgeText: { color: Colors.surface, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', marginHorizontal: 5 },
     bioText: { fontSize: 15, color: '#666', lineHeight: 22, marginTop: 10 },
 
     addFriendBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.primary, paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20, gap: 5 },

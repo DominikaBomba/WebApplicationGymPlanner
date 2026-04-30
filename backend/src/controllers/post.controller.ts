@@ -4,7 +4,6 @@ import { prisma } from '../db/prisma';
 
 export const createPost = async(req: AuthRequest, res: Response) => {
     try {
-        console.log("DANE Z POSTMANA PO ZODZIE:", req.body);
         const userId = Number(req.user?.userId);
 
         if (isNaN(userId)) {

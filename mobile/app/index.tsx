@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Alert, Platform} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Alert, Platform, Image} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -17,8 +17,6 @@ export default function LoginScreen() {
     const { fetchUser } = useUser();
 
     const handleLogin = async () => {
-        console.log("Attempting to login with:", email);
-
         if (!email || !password) {
             Alert.alert("Validation Error", "Please fill in all fields.");
             return;
@@ -34,7 +32,6 @@ export default function LoginScreen() {
             const data = await response.json();
 
             if (response.ok) {
-                console.log("Login successful:", data);
                 Alert.alert("Success", "Welcome back!");
                 Platform.OS === 'web'
                     ?localStorage.setItem('userToken', data.token)
@@ -43,7 +40,18 @@ export default function LoginScreen() {
                 router.replace('/(tabs)/profile');
             } else {
                 console.error("Login failed:", data);
-                Alert.alert("Error", data.message || "Invalid credentials.");
+
+                let errorMsg = data.error || "Invalid credentials.";
+
+                if (data.details && Array.isArray(data.details)) {
+                    errorMsg = data.details.map((err: any) => `• ${err.message}`).join('\n');
+                }
+
+                if (Platform.OS === 'web') {
+                    window.alert(`Error:\n${errorMsg}`);
+                } else {
+                    Alert.alert("Error", errorMsg);
+                }
             }
         } catch (error) {
             console.error("Network error:", error);
@@ -54,7 +62,7 @@ export default function LoginScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.formWrapper}>
-                <Text style={styles.title}>Gym planner</Text>
+                <Image source={require('../assets/images/logo.png')} style={styles.logo} resizeMode="contain"/>
                 <Text style={styles.subtitle}>Sign in to continue</Text>
 
                 <CustomInput
@@ -91,13 +99,6 @@ const styles = StyleSheet.create({
     formWrapper: {
         paddingHorizontal: 20,
     },
-    title: {
-        fontSize: 36,
-        fontWeight: 'bold',
-        color: Colors.dark,
-        textAlign: 'center',
-        marginBottom: 10,
-    },
     subtitle: {
         fontSize: 16,
         color: '#666',
@@ -112,5 +113,11 @@ const styles = StyleSheet.create({
         color: Colors.dark,
         fontSize: 16,
         textDecorationLine: 'underline',
-    }
+    },
+    logo: {
+        width: 300,
+        height: 150,
+        alignSelf: 'center',
+        marginBottom: 10,
+    },
 });

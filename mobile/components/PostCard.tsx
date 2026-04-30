@@ -115,24 +115,39 @@ export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCard
         }
     };
 
+    const handleProfileNavigation = () => {
+        if (!post.user?.nickname) return;
+
+        if (isOwnPost) {
+            router.push('/(tabs)/profile');
+        } else {
+            router.push({
+                pathname: "/user/[nickname]",
+                params: { nickname: post.user.nickname }
+            });
+        }
+    };
+
     const isParticipating = post.participants && post.participants.length > 0;
     const isOwnPost = post.userId === userData?.id;
+
+    const isFull = post.maxParticipants !== null && localCount >= post.maxParticipants;
 
     return (
         <View style={styles.card}>
             <View style={styles.header}>
-                <View style={styles.userInfo}>
+                <TouchableOpacity style={styles.userInfo} onPress={handleProfileNavigation}>
                     <Image source={{ uri: post.user?.profilePicture || 'https://i.pravatar.cc/150?img=11' }} style={styles.avatar} />
                     <View>
                         <Text style={styles.nickname}>{post.user?.nickname}</Text>
                         <Text style={styles.gymInfo}>{post.gym?.name}, {post.gym?.city}</Text>
                     </View>
-                </View>
+                </TouchableOpacity>
 
                 <View style={styles.levelContainer}>
                     {isOwnPost && (
                         <TouchableOpacity onPress={handleDelete} style={styles.deleteIcon}>
-                            <Ionicons name="trash-outline" size={20} color="#ff4444" />
+                            <Ionicons name="trash-outline" size={20} color={Colors.red} />
                         </TouchableOpacity>
                     )}
                     <div style={styles.levelBadge}>
@@ -212,11 +227,20 @@ export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCard
                         </View>
                     ) : (
                         <TouchableOpacity
-                            style={[styles.joinButton, isParticipating && styles.leaveButton]}
+                            style={[
+                                styles.joinButton,
+                                isParticipating && styles.leaveButton,
+                                (!isParticipating && isFull) && styles.fullButton // Nowy styl gdy pełny
+                            ]}
                             onPress={() => onToggleJoin && onToggleJoin(post.id, isParticipating)}
+                            disabled={!isParticipating && isFull}
                         >
-                            <Text style={[styles.joinButtonText, isParticipating && styles.leaveButtonText]}>
-                                {isParticipating ? 'Leave' : 'Join Training'}
+                            <Text style={[
+                                styles.joinButtonText,
+                                isParticipating && styles.leaveButtonText,
+                                (!isParticipating && isFull) && styles.fullButtonText
+                            ]}>
+                                {isParticipating ? 'Leave' : (isFull ? 'Full' : 'Join Training')}
                             </Text>
                         </TouchableOpacity>
                     )}
@@ -290,7 +314,7 @@ const styles = StyleSheet.create({
     levelContainer: { flexDirection: 'row', alignItems: 'center' },
     deleteIcon: { marginRight: 10, padding: 4 },
     levelBadge: { backgroundColor: '#8C7A3C', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 },
-    levelText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
+    levelText: { color: '#fff', fontSize: 10, fontWeight: 'bold', marginHorizontal: 4 },
 
     mainContent: { marginBottom: 12 },
     title: { fontSize: 18, fontWeight: 'bold', color: Colors.dark, marginBottom: 8 },
@@ -315,8 +339,8 @@ const styles = StyleSheet.create({
     ownPostText: { color: Colors.primary, fontWeight: 'bold', fontSize: 13 },
     joinButton: { backgroundColor: Colors.dark, paddingHorizontal: 20, paddingVertical: 8, borderRadius: 12 },
     joinButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
-    leaveButton: { backgroundColor: '#FFEBEE', borderWidth: 1, borderColor: '#ff4444' },
-    leaveButtonText: { color: '#ff4444' },
+    leaveButton: { backgroundColor: '#FFEBEE', borderWidth: 1, borderColor: Colors.red },
+    leaveButtonText: { color: Colors.red },
 
     modalContainer: { flex: 1, backgroundColor: Colors.background },
     modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: Colors.border },
@@ -398,5 +422,7 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         marginBottom: 10,
     },
+    fullButton: { backgroundColor: '#E0E0E0', borderWidth: 0 },
+    fullButtonText: { color: '#999' },
 
 });

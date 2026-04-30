@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Alert, Platform} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Alert, Platform, Image} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import CustomInput from '../components/CustomInput';
@@ -14,8 +14,6 @@ export default function RegisterScreen() {
     const [password, setPassword] = useState('');
 
     const handleRegister = async () => {
-        console.log("Attempting to register:", email);
-
         if (!nickname || !email || !password) {
             Alert.alert("Validation Error", "Please fill in all fields.");
             return;
@@ -31,7 +29,6 @@ export default function RegisterScreen() {
             const data = await response.json();
 
             if (response.ok) {
-                console.log("Registration successful:", data);
                 if(Platform.OS === 'web') {
                     window.alert("Account created successfully!");
                     router.back();
@@ -43,7 +40,18 @@ export default function RegisterScreen() {
 
             } else {
                 console.error("Registration failed:", data);
-                Alert.alert("Error", data.message || "Registration failed.");
+
+                let errorMsg = data.error || "Registration failed.";
+
+                if (data.details && Array.isArray(data.details)) {
+                    errorMsg = data.details.map((err: any) => `• ${err.message}`).join('\n');
+                }
+
+                if (Platform.OS === 'web') {
+                    window.alert(`Error:\n${errorMsg}`);
+                } else {
+                    Alert.alert("Error", errorMsg);
+                }
             }
         } catch (error) {
             console.error("Network error:", error);
@@ -54,7 +62,7 @@ export default function RegisterScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.formWrapper}>
-                <Text style={styles.title}>Join Gym planner</Text>
+                <Image source={require('../assets/images/logo.png')} style={styles.logo} resizeMode="contain"/>
                 <Text style={styles.subtitle}>Create your new account</Text>
 
                 <CustomInput
@@ -98,13 +106,6 @@ const styles = StyleSheet.create({
     formWrapper: {
         paddingHorizontal: 20,
     },
-    title: {
-        fontSize: 36,
-        fontWeight: 'bold',
-        color: Colors.dark,
-        textAlign: 'center',
-        marginBottom: 10,
-    },
     subtitle: {
         fontSize: 16,
         color: '#666',
@@ -119,5 +120,11 @@ const styles = StyleSheet.create({
         color: Colors.dark,
         fontSize: 16,
         textDecorationLine: 'underline',
-    }
+    },
+    logo: {
+        width: 300,
+        height: 150,
+        alignSelf: 'center',
+        marginBottom: 10,
+    },
 });

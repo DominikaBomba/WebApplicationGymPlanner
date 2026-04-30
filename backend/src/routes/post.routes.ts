@@ -11,8 +11,6 @@ router.post('/', authenticate, validate(createPostSchema), createPost);
 router.get('/all', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const currentUserId = Number(req.user?.userId);
-       console.log("aaa----aa")
-        console.log(currentUserId);
         const { city, gymId, levels, durations, startDate, endDate, startTime, endTime, sort } = req.query;
 
         const whereClause: any = { isPublic: true };
@@ -223,7 +221,12 @@ router.post('/join_post', authenticate, async (req: AuthRequest, res: Response) 
         if (!postId) return res.status(400).json({ error: "Post ID is required" });
 
         const targetPost = await prisma.post.findUnique({
-            where: { id: Number(postId) }
+            where: { id: Number(postId) },
+            include: {
+                _count: {
+                    select: { participants: true }
+                }
+            }
         });
 
         if (!targetPost) {
@@ -232,6 +235,10 @@ router.post('/join_post', authenticate, async (req: AuthRequest, res: Response) 
 
         if (targetPost.userId === currentUserId) {
             return res.status(400).json({ error: "You cannot join your own training session" });
+        }
+
+        if (targetPost.maxParticipants !== null && targetPost._count.participants >= targetPost.maxParticipants) {
+            return res.status(400).json({ error: "This training session is already full." });
         }
 
         const existingParticipant = await prisma.participants.findFirst({
@@ -246,10 +253,10 @@ router.post('/join_post', authenticate, async (req: AuthRequest, res: Response) 
             data: { participantId: currentUserId, postId: Number(postId) }
         });
 
-        res.status(201).json({ message: "You signed up", participant: newParticipant });
+        res.status(201).json({ message: "You signed up successfully", participant: newParticipant });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "Error during adding you" });
+        res.status(500).json({ error: "Error occurred while joining the session" });
     }
 });
 
