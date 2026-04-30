@@ -35,7 +35,7 @@ export const registerUser = async (req: Request, res: Response) => {
                 nickname,
                 password: hashedPassword,
                 level: "BEGINNER",
-                description: "opisopis",
+                description: "Hi, I just joined Gym Buddy!",
                 profilePicture : ""
             },
         });

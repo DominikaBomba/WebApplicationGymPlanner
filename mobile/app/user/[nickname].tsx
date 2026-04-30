@@ -141,7 +141,7 @@ export default function UserProfileScreen() {
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.headerSection}>
                     <View style={styles.headerTopRow}>
-                        <Image source={{ uri: targetUser.profilePicture || 'https://via.placeholder.com/150' }} style={styles.avatarLarge} />
+                        <Image source={{ uri: targetUser.profilePicture || require("../../assets/images/no_avatar.png") }} style={styles.avatarLarge} />
                         <View style={styles.headerTextInfo}>
                             <Text style={styles.nameText}>{targetUser.nickname}</Text>
                             <View style={styles.badge}>

@@ -82,7 +82,7 @@ const CustomHeader = () => {
                             renderItem={({ item }) => (
                                 <TouchableOpacity style={styles.resultItem} onPress={() => handleResultClick(item.nickname)}>
                                     <Image
-                                        source={{ uri: item.profilePicture || 'https://via.placeholder.com/150' }}
+                                        source={{ uri: item.profilePicture || require("../../assets/images/no_avatar.png")}}
                                         style={styles.resultAvatar}
                                     />
                                     <View>
@@ -98,7 +98,7 @@ const CustomHeader = () => {
 
             <TouchableOpacity onPress={() => router.push('/(tabs)/profile')}>
                 <Image
-                    source={{ uri: userData?.profilePicture || 'https://via.placeholder.com/150' }}
+                    source={{ uri: userData?.profilePicture || require("../../assets/images/no_avatar.png") }}
                     style={styles.avatar}
                 />
             </TouchableOpacity>

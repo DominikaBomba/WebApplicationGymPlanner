@@ -137,7 +137,7 @@ export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCard
         <View style={styles.card}>
             <View style={styles.header}>
                 <TouchableOpacity style={styles.userInfo} onPress={handleProfileNavigation}>
-                    <Image source={{ uri: post.user?.profilePicture || 'https://i.pravatar.cc/150?img=11' }} style={styles.avatar} />
+                    <Image source={{ uri: post.user?.profilePicture || require("../assets/images/no_avatar.png") }} style={styles.avatar} />
                     <View>
                         <Text style={styles.nickname}>{post.user?.nickname}</Text>
                         <Text style={styles.gymInfo}>{post.gym?.name}, {post.gym?.city}</Text>
@@ -277,7 +277,7 @@ export default function PostCard({ post, onToggleJoin, onDeletePress }: PostCard
                                             router.push({ pathname: "/user/[nickname]", params: { nickname: item.user.nickname } });
                                         }}
                                     >
-                                        <Image source={{ uri: item.user.profilePicture || 'https://via.placeholder.com/150' }} style={styles.friendAvatar} />
+                                        <Image source={{ uri: item.user.profilePicture || require("../assets/images/no_avatar.png")}} style={styles.friendAvatar} />
                                         <View style={styles.friendInfo}>
                                             <Text style={styles.friendName}>{item.user.nickname}</Text>
                                             <Text style={styles.friendLevel}>{item.user.level || 'BEGINNER'}</Text>

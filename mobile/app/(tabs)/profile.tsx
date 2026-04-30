@@ -137,7 +137,7 @@ export default function ProfileScreen(){
             }}
         >
             <Image
-                source={{ uri: item.profilePicture /* || można dodać jakiś defaultowy kidey nie ma progilowego*/ }}
+                source={{ uri: item.profilePicture || require("../../assets/images/no_avatar.png") }}
                 style={styles.friendAvatar}
             />
             <View style={styles.friendInfo}>
@@ -224,7 +224,7 @@ export default function ProfileScreen(){
             <View style={styles.headerSection}>
                 <View style={styles.headerTopRow}>
                     <Image
-                        source={{ uri: userData?.profilePicture /* || można dodać jakiś defaultowy kidey nie ma progilowego*/ }}
+                        source={{ uri: userData?.profilePicture || require("../../assets/images/no_avatar.png")}}
                         style={styles.avatarLarge}
                     />
 
