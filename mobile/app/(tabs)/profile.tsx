@@ -19,14 +19,28 @@ import {API_URL} from "@/constants/api";
 import {Ionicons} from "@expo/vector-icons";
 import {useUser} from "@/context/UserContext";
 import PostCarousel from '../../components/PostCarousel';
+import PlanCarousel from '../../components/PlanCarousel';
+import PlanCard from "@/components/PlanCard";
+import { getOfflinePlans, removePlanOffline } from '../../services/localDatabase';
 
 export default function ProfileScreen(){
     const { userData, loading, logout, fetchUser } = useUser();
     const [friendsModalVisible, setFriendsModalVisible] = useState(false);
 
     const [myPosts, setMyPosts] = useState<any[]>([]);
+    const [myPlans, setMyPlans] = useState<any[]>([]);
+    const [offlinePlans, setOfflinePlans] = useState<any[]>([]);
+
     const [postsLoading, setPostsLoading] = useState(true);
+    const [plansLoading, setPlansLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+
+    const [viewMode, setViewMode] = useState<'all' | 'offline'>('all');
+
+    const loadOfflinePlans = async () => {
+        const plans = await getOfflinePlans();
+        setOfflinePlans(plans);
+    };
 
     const fetchMyPosts = useCallback(async () => {
         if (!userData?.id) return;
@@ -54,9 +68,38 @@ export default function ProfileScreen(){
         }
     }, [userData?.id]);
 
+    const fetchMyPlans = useCallback(async () => {
+        if (!userData?.id) return;
+        setPlansLoading(true);
+        try {
+            const token = Platform.OS === 'web' ? localStorage.getItem('userToken') : await SecureStore.getItemAsync('userToken');
+            const response = await fetch(`${API_URL}/api/plans/my-plans`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                setMyPlans(await response.json());
+                setViewMode('all');
+            } else {
+                throw new Error("API request failed");
+            }
+        } catch (error) {
+            console.error("Network error, switching to Offline Mode:", error);
+            await loadOfflinePlans();
+            setViewMode('offline');
+            if (Platform.OS !== 'web') {
+                Alert.alert("Offline Mode", "Could not connect to server. Showing downloaded plans.");
+            }
+        } finally {
+            setPlansLoading(false);
+            setRefreshing(false);
+        }
+    }, [userData?.id]);
+
     useFocusEffect(
         useCallback(() => {
             fetchMyPosts();
+            fetchMyPlans();
+            loadOfflinePlans();
         }, [fetchMyPosts])
     );
 
@@ -64,6 +107,7 @@ export default function ProfileScreen(){
         setRefreshing(true);
         fetchUser();
         fetchMyPosts();
+        fetchMyPlans();
     }, [fetchUser, fetchMyPosts]);
 
     const handleLogout = async () => {
@@ -122,6 +166,51 @@ export default function ProfileScreen(){
             console.error("Delete error:", error);
         }
     };
+
+    const handleDeletePlan = async (planId: number) => {
+        try {
+            const token = Platform.OS === 'web' ? localStorage.getItem('userToken') : await SecureStore.getItemAsync('userToken');
+            const response = await fetch(`${API_URL}/api/plans/${planId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                setMyPlans(prev => prev.filter(p => p.id !== planId));
+            } else {
+                Alert.alert("Error", "Failed to delete the plan");
+            }
+        } catch (error) {
+            Alert.alert("Error", "Network error occurred.");
+        }
+    };
+
+    const handleRemoveOfflinePlan = async (planId: number) => {
+        const success = await removePlanOffline(planId);
+        if (success) {
+            setOfflinePlans(prev => prev.filter(p => p.id !== planId));
+        }
+    };
+
+    const FilterToggle = () => (
+        <View style={styles.toggleContainer}>
+            <TouchableOpacity
+                style={[styles.toggleBtn, viewMode === 'all' && styles.toggleBtnActive]}
+                onPress={() => setViewMode('all')}
+            >
+                <Text style={[styles.toggleText, viewMode === 'all' && styles.toggleTextActive]}>All</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={[styles.toggleBtn, viewMode === 'offline' && styles.toggleBtnActive]}
+                onPress={() => {
+                    setViewMode('offline');
+                    loadOfflinePlans();
+                }}
+            >
+                <Text style={[styles.toggleText, viewMode === 'offline' && styles.toggleTextActive]}>Offline</Text>
+            </TouchableOpacity>
+        </View>
+    );
+
     return (
         <ScrollView
             style={styles.container}
@@ -169,6 +258,18 @@ export default function ProfileScreen(){
                     posts={myPosts}
                     onAddPress={() => router.push('/add-post')}
                     onDeletePost={handleDeletePost}
+                />
+            )}
+
+            {plansLoading && viewMode === 'all' ? (
+                <ActivityIndicator color={Colors.primary} style={{ marginVertical: 20 }} />
+            ) : (
+                <PlanCarousel
+                    title="My training plans"
+                    plans={viewMode === 'all' ? myPlans : offlinePlans}
+                    onDeletePlan={viewMode === 'all' ? handleDeletePlan : handleRemoveOfflinePlan}
+                    emptyMessage={viewMode === 'all' ? "You haven't created any plans yet." : "No downloaded plans for offline use."}
+                    headerAction={<FilterToggle />}
                 />
             )}
 
@@ -393,5 +494,32 @@ const styles = StyleSheet.create({
         marginTop: 10,
         color: '#999',
         fontSize: 16,
+    },
+    toggleContainer: {
+        flexDirection: 'row',
+        backgroundColor: '#EEEEEE',
+        borderRadius: 20,
+        padding: 4,
+    },
+    toggleBtn: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+    },
+    toggleBtnActive: {
+        backgroundColor: Colors.surface,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    toggleText: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#999',
+    },
+    toggleTextActive: {
+        color: Colors.dark,
     }
 });
