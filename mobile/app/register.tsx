@@ -32,12 +32,12 @@ export default function RegisterScreen() {
 
             if (response.ok) {
                 console.log("Registration successful:", data);
-                if(Platform.OS === 'web') { // przy widoku webowym alerty (Alert.alert) się nie wyświetlają
+                if(Platform.OS === 'web') {
                     window.alert("Account created successfully!");
-                    router.back(); // powrót do logowania
+                    router.back();
                 }else{
                     Alert.alert("Success", "Account created successfully!", [
-                        { text: "OK", onPress: () => router.back() } // powrót do logowania
+                        { text: "OK", onPress: () => router.back() }
                     ]);
                 }
 

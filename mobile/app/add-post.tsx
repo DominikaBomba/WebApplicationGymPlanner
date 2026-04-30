@@ -386,7 +386,7 @@ export default function AddPostScreen() {
 
                         <Text style={styles.modalTitle}>New Training Plan</Text>
 
-                        {/* POPRAWKA: Ten przycisk teraz faktycznie zapisuje cały plan */}
+
                         <TouchableOpacity
                             onPress={handleSavePlan}
                             disabled={isSavingPlan}
