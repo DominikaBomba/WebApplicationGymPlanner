@@ -5,6 +5,7 @@ import userRoutes from "./routes/user.routes";
 import postRoutes from "./routes/post.routes";
 import gymRoutes from "./routes/gym.routes";
 import planRoutes from "./routes/plan.routes";
+import statsRoutes from "./routes/stats.routes";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/gyms', gymRoutes);
 app.use('/api/plans', planRoutes);
+app.use('/api/stats', statsRoutes);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
