@@ -86,4 +86,27 @@ router.get('/friends-plans', authenticate, async (req: AuthRequest, res: Respons
     }
 });
 
+router.delete('/:planId', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        const currentUserId = Number(req.user?.userId);
+        const planId = Number(req.params.planId);
+
+        if (isNaN(planId)) return res.status(400).json({ error: "Invalid Plan ID" });
+
+        const plan = await prisma.trainingPlan.findUnique({ where: { id: planId } });
+
+        if (!plan) return res.status(404).json({ error: "Plan not found" });
+        if (plan.authorId !== currentUserId) {
+            return res.status(403).json({ error: "Unauthorized to delete this plan" });
+        }
+
+        await prisma.trainingPlan.delete({ where: { id: planId } });
+
+        return res.status(200).json({ message: "Plan deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting plan:", error);
+        return res.status(500).json({ error: "An error occurred while deleting the plan" });
+    }
+});
+
 export default router;
