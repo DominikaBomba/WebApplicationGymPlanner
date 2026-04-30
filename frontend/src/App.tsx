@@ -39,7 +39,7 @@ function App() {
                 <Route path={"/goals"}
                        element={<Post/>}/>
 
-                {/* Tutaj chronisz ścieżkę profilu */}
+
                 <Route
                     path="/profile"
                     element={

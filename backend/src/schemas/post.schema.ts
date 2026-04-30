@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Zod musi wiedzieć, jakich dokładnie wartości oczekuje Twój enum w Prisma
 const TrainingDurationEnum = z.enum([
     'LESS_THAN_1_HOUR',
     'FROM_1_TO_2_HOURS',
@@ -37,6 +36,10 @@ export const createPostSchema = z.object({
             .boolean()
             .optional()
             .default(true),
+        trainingPlanId: z
+            .number()
+            .nullable()
+            .optional(),
 
         maxParticipants: z
             .number()
