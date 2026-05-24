@@ -32,7 +32,7 @@ export default function StatsScreen() {
             const data = await response.json();
             setStats(data);
         } catch (e) {
-            console.error("Error fetching stats:", e);
+            console.error("Error fetching Stats:", e);
         } finally {
             setLoading(false);
         }

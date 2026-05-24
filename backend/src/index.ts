@@ -17,7 +17,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/gyms', gymRoutes);
 app.use('/api/plans', planRoutes);
-app.use('/api/stats', statsRoutes);
+app.use('/api/Stats', statsRoutes);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

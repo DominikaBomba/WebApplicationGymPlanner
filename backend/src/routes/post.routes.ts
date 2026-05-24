@@ -237,6 +237,7 @@ router.post('/join_post', authenticate, async (req: AuthRequest, res: Response) 
             return res.status(400).json({ error: "You cannot join your own training session" });
         }
 
+
         if (targetPost.maxParticipants !== null && targetPost._count.participants >= targetPost.maxParticipants) {
             return res.status(400).json({ error: "This training session is already full." });
         }

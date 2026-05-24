@@ -8,7 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import Settings from "./scenes/Settings/Settings.tsx";
 import Post from "./components/Posts";
 import Home from "./scenes/Home";
-
+import Stats from "./scenes/Stats";
 function App() {
     const [isExpanded, setIsExpanded] = useState(false);
     const location = useLocation();
@@ -23,7 +23,7 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         <Route path={"/"} element={<Home />} />
-                        <Route path={"/goals"} element={<Post feedType="all" />} />
+                        <Route path={"/stats"} element={<Stats/>} />
 
                         <Route path="/profile" element={
                             <ProtectedRoute onOpenLogin={() => { }}>

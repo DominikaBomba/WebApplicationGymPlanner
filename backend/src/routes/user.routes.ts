@@ -131,6 +131,36 @@ router.get("/friends/:nickname", authenticate, async (req: AuthRequest, res: Res
         res.status(500).json({ error: "Błąd serwera" });
     }
 });
+router.delete('/friends', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        const currentUserId = Number(req.user?.userId);
+        const { friendId } = req.body;
+
+        if (!friendId) {
+            return res.status(400).json({ error: "Brak identyfikatora znajomego (friendId)" });
+        }
+
+        // Usuwamy relację niezależnie od tego, kto kogo dodał pierwszy
+        const deleteResult = await prisma.friends.deleteMany({
+            where: {
+                OR: [
+                    { userId: currentUserId, friendId: Number(friendId) },
+                    { userId: Number(friendId), friendId: currentUserId }
+                ]
+            }
+        });
+
+        // Jeśli count === 0, oznacza to, że taka relacja w bazie w ogóle nie istniała
+        if (deleteResult.count === 0) {
+            return res.status(404).json({ error: "Nie znaleziono takiej relacji znajomości" });
+        }
+
+        return res.status(200).json({ message: "Usunięto ze znajomych." });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Błąd podczas usuwania znajomego" });
+    }
+});
 router.post('/friends', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const currentUserId = Number(req.user?.userId);

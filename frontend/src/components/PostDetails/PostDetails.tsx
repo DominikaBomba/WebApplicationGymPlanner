@@ -1,4 +1,3 @@
-// components/PostDetails/PostDetails.tsx
 import { useEffect, useState } from 'react';
 import styles from './PostDetails.module.scss';
 
@@ -15,8 +14,6 @@ export default function PostDetails({ postId, onClose }: PostDetailsProps) {
         const fetchDetails = async () => {
             try {
                 const token = localStorage.getItem('token');
-                // Upewnij się, że backend w zapytaniu Prisma robi:
-                // include: { user: true, gym: true, trainingPlan: { include: { exercises: true } }, participants: { include: { user: true } } }
                 const response = await fetch(`http://localhost:3000/api/posts/details/${postId}`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
@@ -32,7 +29,11 @@ export default function PostDetails({ postId, onClose }: PostDetailsProps) {
     }, [postId]);
 
     if (loading) return (
-        <div className={styles.overlay}><div className={styles.modal}>Ładowanie...</div></div>
+        <div className={styles.overlay}>
+            <div className={styles.modal}>
+                <p className={styles.loadingText}>Loading...</p>
+            </div>
+        </div>
     );
 
     if (!post) return null;
@@ -40,94 +41,98 @@ export default function PostDetails({ postId, onClose }: PostDetailsProps) {
     return (
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                <button className={styles.closeButton} onClick={onClose}>&times;</button>
+                <button className={styles.closeButton} onClick={onClose} aria-label="Close">&#x2715;</button>
 
-                {/* Sekcja nagłówka: Autor i Tytuł */}
-                <header className={styles.modalHeader}>
-                    <div className={styles.authorBadge}>
-                        <img
-                            src={post.user.profilePicture || "/default-avatar.png"}
-                            alt="avatar"
-                            className={styles.authorAvatar}
-                        />
-                        <div>
-                            <strong>{post.user.nickname}</strong>
-                            <span>Poziom: {post.user.level}</span>
-                        </div>
+                <div className={styles.modalHeader}>
+                    <img
+                        src={post.user.profilePicture || "/default-avatar.png"}
+                        alt="avatar"
+                        className={styles.authorAvatar}
+                    />
+                    <div className={styles.authorInfo}>
+                        <strong className={styles.authorName}>{post.user.nickname}</strong>
+                        <span className={styles.authorLevel}>{post.user.level}</span>
                     </div>
-                    <h1>{post.title}</h1>
-                </header>
-
-                <hr className={styles.separator} />
-
-                {/* Sekcja głównych informacji o treningu */}
-                <section className={styles.detailsGrid}>
-                    <div className={styles.infoBox}>
-                        <h4>Kiedy i Gdzie?</h4>
-                        <p><strong>📅 Data:</strong> {new Date(post.date).toLocaleString()}</p>
-                        <p><strong>📍 Siłownia:</strong> {post.gym.name}</p>
-                        <p><strong>🏠 Adres:</strong> {post.gym.address}, {post.gym.city}</p>
-                        {post.gym.link && <a href={post.gym.link} target="_blank" rel="noreferrer">Otwórz stronę siłowni</a>}
+                    <div className={styles.badges}>
+                        <span className={styles.badge}>{post.isPublic ? "Public" : "Friends"}</span>
                     </div>
+                </div>
 
-                    <div className={styles.infoBox}>
-                        <h4>Specyfikacja</h4>
-                        <p><strong>⏳ Czas trwania:</strong> {post.trainingDuration.replace(/_/g, ' ')}</p>
-                        <p><strong>👥 Limit:</strong> {post.participants.length} / {post.maxParticipants || 'Brak limitu'}</p>
-                        <p><strong>🔒 Typ:</strong> {post.isPublic ? "Publiczny" : "Dla znajomych"}</p>
+                <h2 className={styles.modalTitle}>{post.title}</h2>
+
+                <hr className={styles.divider} />
+
+                <div className={styles.infoGrid}>
+                    <div className={styles.infoBlock}>
+                        <p className={styles.blockLabel}>When &amp; where</p>
+                        <div className={styles.infoRow}>{new Date(post.date).toLocaleString('en-GB')}</div>
+                        <div className={styles.infoRow}>{post.gym.name}</div>
+                        <div className={styles.infoRow}>{post.gym.address}, {post.gym.city}</div>
+                        {post.gym.link && (
+                            <a href={post.gym.link} target="_blank" rel="noreferrer" className={styles.gymLink}>
+                                Gym website
+                            </a>
+                        )}
                     </div>
-                </section>
+                    <div className={styles.infoBlock}>
+                        <p className={styles.blockLabel}>Details</p>
+                        <div className={styles.infoRow}>{post.trainingDuration.replace(/_/g, ' ')}</div>
+                        <div className={styles.infoRow}>{post.participants.length} / {post.maxParticipants || 'No limit'} spots taken</div>
+                    </div>
+                </div>
 
-                {/* Opis posta */}
-                <section className={styles.textSection}>
-                    <h4>Opis treningu</h4>
-                    <p>{post.description}</p>
+                <hr className={styles.divider} />
+
+                <div className={styles.section}>
+                    <p className={styles.blockLabel}>Description</p>
+                    <p className={styles.description}>{post.description}</p>
                     {post.additionalInfo && (
-                        <div className={styles.additionalInfo}>
-                            <strong>Dodatkowe info:</strong> {post.additionalInfo}
-                        </div>
+                        <p className={styles.additionalInfo}>{post.additionalInfo}</p>
                     )}
-                </section>
+                </div>
 
-                {/* Plan Treningowy i Ćwiczenia */}
                 {post.trainingPlan && (
-                    <section className={styles.planSection}>
-                        <h3>📋 Plan: {post.trainingPlan.title}</h3>
-                        <div className={styles.exercisesContainer}>
+                    <>
+                        <hr className={styles.divider} />
+                        <div className={styles.section}>
+                            <p className={styles.blockLabel}>Training plan — {post.trainingPlan.title}</p>
                             {post.trainingPlan.exercises.length > 0 ? (
-                                <table className={styles.exerciseTable}>
-                                    <thead>
-                                    <tr>
-                                        <th>Ćwiczenie</th>
-                                        <th>Serie/Powtórzenia</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
+                                <div className={styles.exerciseList}>
                                     {post.trainingPlan.exercises.map((ex: any) => (
-                                        <li key={ex.id} className={styles.exerciseRow}>
-                                            <strong>{ex.name}</strong> — {ex.reps}
-                                        </li>
+                                        <div key={ex.id} className={styles.exerciseRow}>
+                                            <span className={styles.exerciseName}>{ex.name}</span>
+                                            <span className={styles.exerciseReps}>{ex.reps}</span>
+                                        </div>
                                     ))}
-                                    </tbody>
-                                </table>
-                            ) : <p>Brak ćwiczeń w tym planie.</p>}
+                                </div>
+                            ) : (
+                                <p className={styles.emptyText}>No exercises in this plan.</p>
+                            )}
                         </div>
-                    </section>
+                    </>
                 )}
 
+                <hr className={styles.divider} />
 
-                <section className={styles.participantsSection}>
-                    <h3>👥 Uczestnicy ({post.participants.length})</h3>
-                    <div className={styles.participantsList}>
-                        {post.participants.map((p: any) => (
-                            <div key={p.id} className={styles.participantItem}>
-                                <img className={styles.friendsAvatar} src={p.user.profilePicture || "/default-avatar.png"} alt="avatar" />
-                                <span>{p.user.nickname}</span>
-                            </div>
-                        ))}
-                        {post.participants.length === 0 && <p>Nikt jeszcze nie dołączył.</p>}
-                    </div>
-                </section>
+                <div className={styles.section}>
+                    <p className={styles.blockLabel}>Participants ({post.participants.length})</p>
+                    {post.participants.length === 0 ? (
+                        <p className={styles.emptyText}>No one has joined yet.</p>
+                    ) : (
+                        <div className={styles.participantsList}>
+                            {post.participants.map((p: any) => (
+                                <div key={p.id} className={styles.participantItem}>
+                                    <img
+                                        className={styles.participantAvatar}
+                                        src={p.user.profilePicture || "/default-avatar.png"}
+                                        alt="avatar"
+                                    />
+                                    <span>{p.user.nickname}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -86,6 +86,20 @@ router.get('/friends-plans', authenticate, async (req: AuthRequest, res: Respons
     }
 });
 
+router.get('/user/:userId', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = Number(req.params.userId);
+
+        const plans = await prisma.trainingPlan.findMany({
+            where: { authorId: userId },
+            include: { exercises: true },
+            orderBy: { createdAt: 'desc' }
+        });
+        res.json(plans);
+    } catch (error) {
+        res.status(500).json({ error: "Error fetching plans." });
+    }
+});
 router.delete('/:planId', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const currentUserId = Number(req.user?.userId);

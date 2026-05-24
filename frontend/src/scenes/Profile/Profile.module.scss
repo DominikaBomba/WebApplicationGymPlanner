@@ -1,34 +1,21 @@
-
-$primary-color: #4a90e2;
-$border-color: #ddd;
-$text-color: #333;
-$bg-color: #f9f9f9;
+$border-color: #eee;
+$text-muted: #888;
 
 .profile-container {
-  max-width: 600px;
+  max-width: 680px;
   margin: 2rem auto;
-  padding: 20px;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  font-family: sans-serif;
-  color: $text-color;
-
-  h1 {
-    text-align: center;
-    color: $primary-color;
-    margin-bottom: 1.5rem;
-  }
+  padding: 0 20px 40px;
+  color: #1a1a1a;
 }
 
-.user-info {
+.profileTop {
   display: flex;
-  gap: 20px;
+  gap: 24px;
   align-items: flex-start;
-  border-top: 1px solid $border-color;
-  padding-top: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid $border-color;
+  margin-bottom: 24px;
 
-  // Responsywność - na małych ekranach zdjęcie będzie nad tekstem
   @media (max-width: 480px) {
     flex-direction: column;
     align-items: center;
@@ -37,38 +24,296 @@ $bg-color: #f9f9f9;
 }
 
 .avatar-preview {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%; // Okrągłe zdjęcie
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
   object-fit: cover;
-  border: 3px solid $primary-color;
+  border: 1px solid $border-color;
+  flex-shrink: 0;
 }
 
-.details {
+.profileMeta {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-  p {
-    margin: 8px 0;
-    line-height: 1.5;
+.profileNameRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 
-    strong {
-      color: #555;
-    }
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: #1a1a1a;
   }
+}
+
+.youBadge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: #f5f5f5;
+  color: $text-muted;
+  border: 1px solid $border-color;
+}
+
+.levelText {
+  font-size: 0.8125rem;
+  color: $text-muted;
+  margin: 0;
+}
+
+.descriptionText {
+  font-size: 0.875rem;
+  color: #444;
+  margin: 4px 0 8px;
+  line-height: 1.5;
+}
+
+.statsRow {
+  display: flex;
+  gap: 24px;
+  margin: 8px 0;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.statNumber {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: $text-muted;
+}
+
+.editLink {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  border: 1px solid #1a1a1a;
+  border-radius: 8px;
+  padding: 6px 16px;
+  text-decoration: none;
+  width: fit-content;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+}
+
+.friendBtn {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: 1px solid #1a1a1a;
+  background: #1a1a1a;
+  color: #fff;
+  cursor: pointer;
+  width: fit-content;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.removeBtn {
+  background: #fff;
+  color: #1a1a1a;
+  border: 1px solid $border-color;
+}
+
+.friendsStrip {
+  margin-bottom: 24px;
+}
+
+.stripLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 10px;
+}
+
+.friends-avatar-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.friendAvatarWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+
+  .friendNickname {
+    font-size: 0.65rem;
+    color: $text-muted;
+    text-align: center;
+    max-width: 48px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.avatar-friends {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid $border-color;
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.contentSection {
+  margin-top: 28px;
+  border-top: 1px solid $border-color;
+  padding-top: 20px;
+
+  h2 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px;
+  }
+}
+
+.countBadge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: #f5f5f5;
+  color: $text-muted;
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid $border-color;
+}
+
+.plansGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.planCard {
+  background: #ffffff;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: #d0d0d0;
+  }
+}
+
+.planHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+
+  h4 {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.3;
+  }
+}
+
+.exerciseCount {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: $text-muted;
+  background: #f5f5f5;
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid $border-color;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.exerciseList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.exerciseRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 0.8125rem;
+  color: #444;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.reps {
+  font-size: 0.75rem;
+  color: $text-muted;
+}
+
+.moreExercises {
+  font-size: 0.75rem;
+  color: $text-muted;
+  margin: 6px 0 0;
+}
+
+.emptyText {
+  font-size: 0.875rem;
+  color: $text-muted;
 }
 
 .loading {
   text-align: center;
   padding: 50px;
-  font-size: 1.2rem;
-  color: $primary-color;
+  font-size: 1rem;
+  color: $text-muted;
 }
-.friendCard{
-  height: 200px;
-  img{
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-  }
 
+.error {
+  text-align: center;
+  padding: 50px;
+  font-size: 0.875rem;
+  color: #e63946;
 }
