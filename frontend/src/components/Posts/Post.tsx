@@ -1,46 +1,55 @@
 
     import { useEffect, useState } from 'react';
     import styles from './Post.module.scss';
-    import { Link } from "react-router";
-    import PostDetails from '../PostDetails/PostDetails'; // Upewnij się, że ścieżka jest poprawna
+    import { Link, useNavigate } from "react-router";
+import PostDetails from '../PostDetails/PostDetails'; // Upewnij się, że ścieżka jest poprawna
 
-    interface PostProps {
-        feedType: 'all' | 'friends';
-    }
+interface PostProps {
+    feedType: 'all' | 'friends' | 'joined' | 'mine';
+}
 
-    export default function Post({ feedType }: PostProps) {
-        const currentUserId = Number(localStorage.getItem('userId')); // Przykład
-        const [posts, setPosts] = useState<any[]>([]);
-        const [loading, setLoading] = useState(true);
-        const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+export default function Post({ feedType }: PostProps) {
+    const currentUserId = Number(localStorage.getItem('userId')); // Przykład
+    const [posts, setPosts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
 
-        const fetchPosts = async () => {
-            try {
-                setLoading(true);
-                const token = localStorage.getItem('token');
-                const endpoint = feedType === 'friends' ? 'friends-feed' : 'all';
+    const fetchPosts = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            let endpoint = 'all';
+            if (feedType === 'friends') endpoint = 'friends-feed';
+            else if (feedType === 'joined') endpoint = 'joined';
+            else if (feedType === 'mine') endpoint = `${currentUserId}`;
 
-                const response = await fetch(`http://localhost:3000/api/posts/${endpoint}`, {
-                    headers: {"Authorization": `Bearer ${token}`}
-                });
+            const response = await fetch(`http://localhost:3000/api/posts/${endpoint}`, {
+                headers: {"Authorization": `Bearer ${token}`}
+            });
 
-                const data = await response.json();
-                setPosts(Array.isArray(data) ? data : []);
-            } catch (err) {
-                console.error("Błąd:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
+            const data = await response.json();
+            setPosts(Array.isArray(data) ? data : []);
+        } catch (err) {
+            console.error("Błąd:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        useEffect(() => {
-            fetchPosts();
-        }, [feedType]);
+    useEffect(() => {
+        fetchPosts();
+    }, [feedType]);
+
+    const navigate = useNavigate();
 
         const handleJoin = async (e: React.MouseEvent, postId: number) => {
             e.stopPropagation();
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/login');
+                return;
+            }
             try {
-                const token = localStorage.getItem('token');
                 const response = await fetch(`http://localhost:3000/api/posts/join_post`, {
                     method: 'POST',
                     headers: {
@@ -63,8 +72,12 @@
 
         const handleLeave = async (e: React.MouseEvent, postId: number) => {
             e.stopPropagation();
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/login');
+                return;
+            }
             try {
-                const token = localStorage.getItem('token');
                 const response = await fetch(`http://localhost:3000/api/posts/leave_post`, {
                     method: 'DELETE',
                     headers: {
@@ -119,7 +132,13 @@
                                 <div className={styles.buttonGroup}>
                                     <button
                                         className={styles.detailsButton}
-                                        onClick={() => setSelectedPostId(post.id)}
+                                        onClick={() => {
+                                            if (!localStorage.getItem('token')) {
+                                                navigate('/login');
+                                            } else {
+                                                setSelectedPostId(post.id);
+                                            }
+                                        }}
                                     >
                                         Szczegóły
                                     </button>

@@ -1,19 +1,17 @@
 // src/components/ProtectedRoute/ProtectedRoute.tsx
-import { Navigate } from "react-router-dom";
+import { Navigate } from "react-router";
 import {type JSX} from "react";
 
 interface ProtectedRouteProps {
     children: JSX.Element;
-    onOpenLogin: () => void;
+    onOpenLogin?: () => void;
 }
 
-export default function ProtectedRoute({ children, onOpenLogin }: ProtectedRouteProps) {
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     const token = localStorage.getItem("token");
 
     if (!token) {
-
-        onOpenLogin();
-        return <Navigate to="/" replace />;
+        return <Navigate to="/login" replace />;
     }
 
     return children;

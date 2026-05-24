@@ -1,16 +1,16 @@
 import { createPost } from '../controllers/post.controller';
 import { validate } from '../middlewares/validate';
 import { createPostSchema } from '../schemas/post.schema';
-import { authenticate, AuthRequest } from '../middlewares/auth.middleware';
+import { authenticate, optionalAuthenticate, AuthRequest } from '../middlewares/auth.middleware';
 import { Router, Response } from 'express';
 import { prisma } from '../db/prisma';
 
 const router = Router();
 router.post('/', authenticate, validate(createPostSchema), createPost);
 
-router.get('/all', authenticate, async (req: AuthRequest, res: Response) => {
+router.get('/all', optionalAuthenticate, async (req: AuthRequest, res: Response) => {
     try {
-        const currentUserId = Number(req.user?.userId);
+        const currentUserId = req.user?.userId ? Number(req.user.userId) : -1;
         const { city, gymId, levels, durations, startDate, endDate, startTime, endTime, sort } = req.query;
 
         const whereClause: any = { isPublic: true };

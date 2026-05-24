@@ -1,72 +1,44 @@
-import Navbar from "./components/Navbar";
+import Navbar from "./components/Navbar/Navbar";
 import Register from "./components/Register";
-import {useLocation, Route, Routes} from "react-router";
+import { useLocation, Route, Routes } from "react-router";
 import Login from "./components/Login";
-import {useState} from "react";
+import { useState } from "react";
 import Profile from "./scenes/Profile"
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import Settings from "./scenes/Settings/Settings.tsx";
-import Search from "./components/Search";
-import AddPost from "./components/AddPost";
 import Post from "./components/Posts";
 import Home from "./scenes/Home";
 
-
 function App() {
-    const [isAuthOpen, setIsAuthOpen] = useState(false);
-    const [authMode, setAuthMode] = useState<"login" | "register">("login");
+    const [isExpanded, setIsExpanded] = useState(false);
     const location = useLocation();
 
-
-    const token = localStorage.getItem("token");
-
-    const showNavbar = location.pathname !== "/login";
+    const showNavbar = location.pathname !== "/login" && location.pathname !== "/register";
     return (
         <>
+            {showNavbar && <Navbar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />}
+            <main className={`content-wrapper ${isExpanded ? 'expanded' : ''} ${!showNavbar ? 'no-sidebar' : ''}`}>
+                <div className="scroll-area">
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path={"/"} element={<Home />} />
+                        <Route path={"/goals"} element={<Post feedType="all" />} />
 
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=bar_chart_4_bars,home_app_logo,logout,man,notifications,settings"/>
-
-
-
-
-            {showNavbar && <Navbar />}
-            <main className="content-wrapper">
-            <Routes>
-                <Route path={"/"  }
-                       element={
-                            <Home/>
-                       } />
-                <Route path={"/goals"}
-                       element={<Post/>}/>
-
-
-                <Route
-                    path="/profile"
-                    element={
-                        <ProtectedRoute onOpenLogin={() => setIsAuthOpen(true)}>
-                            <Profile />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/settings"
-                    element={
-                        <ProtectedRoute onOpenLogin={() => setIsAuthOpen(true)}>
-                            <Settings />
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route
-                    path="/profile/:nickname"
-                    element={
-                        <Profile/>
-                    }
-                />
-            </Routes>
-
+                        <Route path="/profile" element={
+                            <ProtectedRoute onOpenLogin={() => { }}>
+                                <Profile />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/settings" element={
+                            <ProtectedRoute onOpenLogin={() => { }}>
+                                <Settings />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/profile/:nickname" element={<Profile />} />
+                    </Routes>
+                </div>
             </main>
-
         </>
     )
 }

@@ -3,11 +3,13 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import PlanCreator from "../PlanCreator/PlanCreator"; // dostosuj ścieżkę
 
-export enum TrainingDuration {
-    LESS_THAN_1_HOUR = 'LESS_THAN_1_HOUR',
-    FROM_1_TO_2_HOURS = 'FROM_1_TO_2_HOURS',
-    MORE_THAN_2_HOURS = 'MORE_THAN_2_HOURS'
-}
+export const TrainingDuration = {
+    LESS_THAN_1_HOUR: 'LESS_THAN_1_HOUR',
+    FROM_1_TO_2_HOURS: 'FROM_1_TO_2_HOURS',
+    MORE_THAN_2_HOURS: 'MORE_THAN_2_HOURS'
+} as const;
+
+export type TrainingDuration = typeof TrainingDuration[keyof typeof TrainingDuration];
 
 export default function AddPost() {
     const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +22,7 @@ export default function AddPost() {
         gymId: "",
         date: "2026-04-04",
         time: "18:00",
-        trainingDuration: TrainingDuration.FROM_1_TO_2_HOURS,
+        trainingDuration: TrainingDuration.FROM_1_TO_2_HOURS as TrainingDuration,
         description: "",
         isPublic: true,
         additionalInfo: "",
@@ -104,11 +106,19 @@ export default function AddPost() {
     const selectedPlan = allPlans.find((p: any) => p.id === selectedPlanId);
 
     if (!isOpen) {
-        return <button onClick={() => setIsOpen(true)}>Add Post</button>;
+        return (
+            <button className={styles.fabButton} onClick={() => setIsOpen(true)}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+        );
     }
 
     return (
-        <div className={styles.container}>
+        <div className={styles.modalOverlay}>
+            <div className={styles.container}>
             <h2>Add post</h2>
 
             <div className={styles.formGrid}>
@@ -273,6 +283,7 @@ export default function AddPost() {
             </div>
 
             <button style={{marginTop: "20px"}} onClick={() => setIsOpen(false)}>Anuluj</button>
+            </div>
         </div>
     );
 }

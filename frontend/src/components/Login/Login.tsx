@@ -1,15 +1,10 @@
 import styles from "./Login.module.scss";
-import {useNavigate} from "react-router";
-import {useState} from "react";
-import {useMutation} from "@tanstack/react-query";
+import { useNavigate, Link } from "react-router";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import CloseIcon from "../../assets/icons/close.svg?react";
 
-interface LoginProps {
-    onClose: () => void;
-    onSwitchToRegister: () => void;
-}
-
-
-export default function Login({ onClose , onSwitchToRegister}: LoginProps) {
+export default function Login() {
     const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
@@ -25,14 +20,15 @@ export default function Login({ onClose , onSwitchToRegister}: LoginProps) {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || "Register failed");
+                throw new Error(errorData.error || "Login failed");
             }
 
             return response.json();
         },
         onSuccess: (data) => {
             localStorage.setItem("token", data.token); //saving token
-            onClose();
+            navigate("/"); // Redirect to home after login
+            window.location.reload();
         },
     });
 
@@ -42,15 +38,16 @@ export default function Login({ onClose , onSwitchToRegister}: LoginProps) {
     };
 
     return (
-        <div className={styles["login-container"]}>
-
+        <div className={styles["login-container-fullscreen"]}>
             <div className={styles["login-card"]}>
-                <button className={styles["close-x"]} onClick={onClose}>✕</button>
                 <div className={styles["login-form-section"]}>
+                    <Link to="/" className={styles.closeButton}>
+                        <CloseIcon />
+                    </Link>
                     <div className={styles["form-header"]}>
-                        <span className={styles["home-emoji"]}></span>
-                        <h1>Welcome to ...</h1>
-                        <p>Enter your details and lets move on!</p>
+                        <span className={styles["home-emoji"]}>💪</span>
+                        <h1>Welcome Back!</h1>
+                        <p>Enter your details and let's move on!</p>
                     </div>
 
                     <form onSubmit={handleSubmit}>
@@ -77,7 +74,6 @@ export default function Login({ onClose , onSwitchToRegister}: LoginProps) {
                         </div>
                         {error && <p className={styles["error-message"]}>{error.message}</p>}
                         <div className={styles["form-options"]}>
-
                             <a href="#" className={styles["forgot-password"]}>Forgot password?</a>
                         </div>
 
@@ -89,14 +85,12 @@ export default function Login({ onClose , onSwitchToRegister}: LoginProps) {
                             {isPending ? "Logging in..." : "Login"}
                         </button>
 
-                        <p>
+                        <p className={styles["switch-auth"]}>
                             You don't have an account?
-                            <a href="#" onClick={(e) => { e.preventDefault(); onSwitchToRegister(); }}> SignUp</a>
+                            <Link to="/register"> SignUp</Link>
                         </p>
                     </form>
                 </div>
-
-
             </div>
         </div>
     );

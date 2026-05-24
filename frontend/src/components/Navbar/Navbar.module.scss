@@ -1,116 +1,187 @@
-$color-primary: #00d1b2;
-$color-dark-bg: #1a1a1a;
+$color-dark-bg: $color-dark;
 $color-text-muted: #888;
-$navbar-width: 100px;
+$navbar-width-collapsed: 100px;
+$navbar-width-expanded: 240px;
 $topbar-height: 70px;
 
 .NavbarHeader {
   position: fixed;
-  top: 0;
-  left: $navbar-width;
-  right: 0;
+  top: 1rem;
+  left: 100px;
+  right: 1rem;
   height: $topbar-height;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 2rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(4px);
+  border-radius: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   z-index: 10;
+  transition: left 0.3s ease;
 
-  .registerBtn {
+  &.expanded {
+    left: 240px;
+  }
+
+
+  .registerBtn, .logoutBtn {
     padding: 0.6rem 1.5rem;
-
-    color: white;
+    background-color: $color-dark;
+    color: $color-surface;
     border: none;
     border-radius: 25px;
     font-weight: 600;
     cursor: pointer;
+    text-decoration: none;
     transition: transform 0.2s ease;
 
     &:hover {
       transform: scale(1.05);
     }
   }
-}
 
-.loginOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
+  .logoutBtn {
+    background-color: $color-dark;
+    color: $color-surface;
+
+    &:hover {
+      background-color: #ef4444;
+    }
+  }
 }
 
 .Navbar {
+  box-sizing: border-box;
   position: fixed;
-  left: 0;
-  top: 0;
-  width: $navbar-width;
-  height: 100vh;
+  left: 1rem;
+  top: 1rem;
+  bottom: 1rem;
+  width: calc(#{$navbar-width-collapsed} - 2rem);
+  background-color: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(4px);
+  border-radius: 24px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 1.5rem 0;
-
-  border-right: 1px solid rgba(0, 0, 0, 0.05);
+  align-items: flex-start;
+  padding: 1.5rem 10px;
   z-index: 20;
+  transition: width 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  white-space: nowrap;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  &.expanded {
+    width: calc(#{$navbar-width-expanded} - 2rem);
+
+    .PillContainer {
+      li {
+        width: 100%;
+        border-radius: 24px;
+      }
+    }
+  }
 
   .TopSection {
     margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    width: 100%;
+
+    .ToggleButton {
+      position: absolute;
+      top: -0.5rem;
+      right: calc(50% - 12px);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #aaa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: right 0.3s ease, transform 0.3s ease, color 0.2s;
+
+      &:hover {
+        color: $color-dark;
+      }
+
+      &.expanded {
+        right: 0.5rem;
+        transform: rotate(180deg);
+      }
+    }
+
     .NavbarLogo {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
+      width: auto;
+      height: 50px;
       object-fit: cover;
+      margin-top: 1rem;
     }
   }
 
   .MiddleSection {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    justify-content: space-between;
+    gap: 1rem;
     flex: 1;
+    width: 100%;
   }
 
   .BottomSection {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
+    width: 100%;
+    min-height: 56px;
+    display: flex;
+    align-items: flex-end;
   }
 
   .PillContainer {
-    background-color: #f8f9fa;
-    border-radius: 50px;
-    padding: 0.7rem;
     list-style: none;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 0;
+    margin: 0;
+    width: 100%;
 
     li {
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
       width: 48px;
       height: 48px;
-      border-radius: 50%;
-      transition: all 0.2s ease;
+      border-radius: 48px;
+      transition: width 0.3s ease, border-radius 0.3s ease, background-color 0.2s;
+      cursor: pointer;
 
       &.ActiveItem {
-        background-color: $color-dark-bg;
+        background-color: $color-primary;
+
         .NavbarLink {
-          color: $color-primary;
+          color: $color-dark;
         }
       }
 
       &:hover:not(.ActiveItem) {
-        background-color: #eee;
+        background-color: rgba(0, 0, 0, 0.05);
+
+        .LogoutLink {
+          color: #ef4444;
+
+          svg.icon {
+            fill: #ef4444;
+          }
+        }
       }
     }
   }
@@ -120,25 +191,113 @@ $topbar-height: 70px;
     color: $color-text-muted;
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    gap: 1.25rem;
+    width: 100%;
+    justify-content: flex-start;
+    padding-left: 12px;
 
-    span {
+    span.material-symbols-outlined,
+    svg.icon {
+      width: 24px;
+      height: 24px;
       font-size: 24px;
+      fill: currentColor;
+      flex-shrink: 0;
+      transition: fill 0.2s ease;
+    }
+
+    .LinkLabel {
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    &.LogoutLink {
+      transition: color 0.2s ease;
     }
   }
 
   .ProfileAvatar {
-    img {
-      width: 45px;
-      height: 45px;
+    justify-content: flex-start !important;
+    padding: 0 !important;
+    width: 100%;
+    height: 56px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    .AvatarLink {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: inherit;
+      width: 100%;
+      height: 100%;
+      padding-left: 4px;
+      gap: 0.75rem;
+      transition: background-color 0.2s;
+    }
+
+    .AvatarImg {
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid transparent;
       transition: border-color 0.2s;
+      flex-shrink: 0;
 
       &:hover {
         border-color: $color-primary;
+      }
+    }
+
+    .UserInfo {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      overflow: hidden;
+
+      .UserNickname {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: $color-dark;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .UserLevel {
+        font-size: 0.75rem;
+        color: $color-text-muted;
+        text-transform: uppercase;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  &.expanded {
+    .NavbarLink {
+      .LinkLabel {
+        opacity: 1;
+      }
+    }
+
+    .ProfileAvatar {
+      background-color: rgba(0, 0, 0, 0.03);
+
+      .AvatarLink {
+        padding-left: 4px;
+      }
+
+      .UserInfo {
+        opacity: 1;
       }
     }
   }

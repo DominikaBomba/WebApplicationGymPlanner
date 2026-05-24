@@ -1,22 +1,36 @@
 .searchWrapper {
   position: relative;
   width: 100%;
-  max-width: 300px; // Możesz dostosować do Navbaru
+  max-width: 400px;
 
   .inputArea {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .searchIcon {
+      position: absolute;
+      left: 16px;
+      width: 20px;
+      height: 20px;
+      fill: #888;
+      pointer-events: none;
+    }
+
     input {
       width: 100%;
-      padding: 8px 16px;
-      border-radius: 20px;
-      border: 1px solid #ddd;
-      background: #f9f9f9;
+      padding: 12px 24px 12px 44px;
+      border-radius: 30px;
+      border: 1px solid var(--color-border, #ddd);
+      background: var(--color-surface, #fff);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
       transition: all 0.2s;
+      font-family: inherit;
 
       &:focus {
         outline: none;
-        background: #fff;
-        border-color: #007bff;
-        box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        border-color: var(--color-primary, #FFDC6C);
+        box-shadow: 0 0 0 3px rgba(255, 220, 108, 0.2);
       }
     }
   }

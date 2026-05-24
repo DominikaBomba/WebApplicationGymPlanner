@@ -1,74 +1,104 @@
-
-$primary-color: #4a90e2;
-$border-color: #ddd;
-$text-color: #333;
-$bg-color: #f9f9f9;
-
-.profile-container {
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 20px;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  font-family: sans-serif;
-  color: $text-color;
-
-  h1 {
-    text-align: center;
-    color: $primary-color;
-    margin-bottom: 1.5rem;
-  }
-}
-
-.user-info {
+.landingPage {
   display: flex;
-  gap: 20px;
-  align-items: flex-start;
-  border-top: 1px solid $border-color;
-  padding-top: 20px;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 140px);
+  padding: 2rem;
+}
 
-  // Responsywność - na małych ekranach zdjęcie będzie nad tekstem
-  @media (max-width: 480px) {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+.heroSection {
+  max-width: 800px;
+  text-align: center;
+  background-color: var(--color-surface, #ffffff);
+  padding: 4rem 3rem;
+  border-radius: 32px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+
+  .heroTitle {
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--color-dark, #24272E);
+    margin: 0;
+    letter-spacing: -0.05em;
   }
-}
 
-.avatar-preview {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%; // Okrągłe zdjęcie
-  object-fit: cover;
-  border: 3px solid $primary-color;
-}
+  .heroSubtitle {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #888;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+  }
 
-.details {
-  flex: 1;
+  .heroDescription {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 3rem;
+  }
 
-  p {
-    margin: 8px 0;
-    line-height: 1.5;
+  .ctaContainer {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 
-    strong {
-      color: #555;
+  .ctaButtonPrimary, .ctaButtonSecondary {
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 1.1rem;
+  }
+
+  .ctaButtonPrimary {
+    background-color: var(--color-primary, #FFDC6C);
+    color: var(--color-dark, #24272E);
+    box-shadow: 0 4px 15px rgba(255, 220, 108, 0.4);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 220, 108, 0.6);
+    }
+  }
+
+  .ctaButtonSecondary {
+    background-color: transparent;
+    color: var(--color-dark, #24272E);
+    border: 2px solid var(--color-border, #D0C7B6);
+
+    &:hover {
+      background-color: rgba(0,0,0,0.05);
     }
   }
 }
 
-.loading {
-  text-align: center;
-  padding: 50px;
-  font-size: 1.2rem;
-  color: $primary-color;
+.dashboardContainer {
+  padding: 1rem;
 }
-.friendCard{
-  height: 200px;
-  img{
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-  }
 
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.feedSection {
+  background-color: var(--color-surface, #ffffff);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+
+  .sectionTitle {
+    font-size: 1.5rem;
+    color: var(--color-dark, #24272E);
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border, #D0C7B6);
+    padding-bottom: 1rem;
+  }
 }

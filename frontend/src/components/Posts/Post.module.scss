@@ -1,13 +1,9 @@
 .feedContainer {
-  max-width: 1200px;
-  margin: 20px auto;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-direction: column;
+  flex-wrap: nowrap;
   gap: 20px;
-  justify-content: center;
-  padding: 0 15px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 10px 5px;
 }
 
 .avatar{
@@ -15,10 +11,9 @@
   border-radius: 100px;
 }
 .postCard {
-
-  flex: 1 1 calc(33.33% - 20px);
-  min-width: 300px;
-  max-width: 400px;
+  flex: 0 0 320px;
+  min-width: 320px;
+  max-width: 350px;
 
   background-color: #ffffff;
   border-radius: 12px;

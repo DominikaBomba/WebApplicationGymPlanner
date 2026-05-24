@@ -1,13 +1,11 @@
 import styles from "./Register.module.scss";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useNavigate, Link } from "react-router";
+import CloseIcon from "../../assets/icons/close.svg?react";
 
-interface RegisterProps {
-    onClose: () => void;
-    onSwitchToLogin: () => void;
-}
-
-export default function Register({ onClose, onSwitchToLogin }: RegisterProps) {
+export default function Register() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [nickname, setNickname] = useState("");
     const [password, setPassword] = useState("");
@@ -22,7 +20,6 @@ export default function Register({ onClose, onSwitchToLogin }: RegisterProps) {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                // If Zod validation fails, detailed errors are in errorData.details
                 throw new Error(errorData.error || "Registration failed");
             }
 
@@ -30,23 +27,22 @@ export default function Register({ onClose, onSwitchToLogin }: RegisterProps) {
         },
         onSuccess: () => {
             alert("Account created successfully! You can now log in.");
-            onSwitchToLogin(); // Transition to login view after success
+            navigate("/login"); // Transition to login view after success
         },
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Sending data mapping 'email' to 'login' to match your schema
         mutate({ login: email, nickname, password });
     };
 
     return (
-
-        <div className={styles["login-container"]}>
-
+        <div className={styles["login-container-fullscreen"]}>
             <div className={styles["login-card"]}>
-                <button className={styles["close-x"]} onClick={onClose}>✕</button>
                 <div className={styles["login-form-section"]}>
+                    <Link to="/" className={styles.closeButton}>
+                        <CloseIcon />
+                    </Link>
                     <div className={styles["form-header"]}>
                         <h1>Create Account</h1>
                         <p>Enter your details below to join us!</p>
@@ -96,15 +92,13 @@ export default function Register({ onClose, onSwitchToLogin }: RegisterProps) {
                             {isPending ? "Creating account..." : "Sign Up"}
                         </button>
 
-                        <p>
+                        <p className={styles["switch-auth"]}>
                             Already have an account?
-                            <a href="#" onClick={(e) => { e.preventDefault(); onSwitchToLogin(); }}> Log In</a>
+                            <Link to="/login"> Log In</Link>
                         </p>
                     </form>
                 </div>
-
             </div>
         </div>
-
     );
 }
