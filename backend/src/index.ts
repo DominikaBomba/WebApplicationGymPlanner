@@ -18,8 +18,14 @@ app.use('/api/posts', postRoutes);
 app.use('/api/gyms', gymRoutes);
 app.use('/api/plans', planRoutes);
 app.use('/api/Stats', statsRoutes);
+
+// Export app for Supertest (tests import the app without starting the server)
+export default app;
+
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
+}

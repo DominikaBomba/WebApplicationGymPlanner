@@ -5,3 +5,5 @@ node_modules
 /frontend/.env
 /generated/prisma
 
+# Test coverage reports
+coverage/
