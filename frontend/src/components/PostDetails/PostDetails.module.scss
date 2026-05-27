@@ -12,9 +12,9 @@
 }
 
 .modal {
-  background: #ffffff;
+  background: $color-surface;
   border-radius: 12px;
-  border: 1px solid #eee;
+  border: 1px solid $color-border;
   width: 90%;
   max-width: 580px;
   max-height: 85vh;
@@ -24,7 +24,7 @@
 
 .loadingText {
   font-size: 0.875rem;
-  color: #888;
+  color: $color-text-muted;
   padding: 24px;
   margin: 0;
 }
@@ -34,7 +34,7 @@
   top: 14px;
   right: 14px;
   background: none;
-  border: 1px solid #eee;
+  border: 1px solid $color-border;
   border-radius: 6px;
   width: 28px;
   height: 28px;
@@ -42,12 +42,12 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #888;
+  color: $color-text-muted;
   font-size: 14px;
   line-height: 1;
 
   &:hover {
-    background: #f5f5f5;
+    background: $color-background;
   }
 }
 
@@ -63,7 +63,7 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #eee;
+  border: 1px solid $color-border;
   flex-shrink: 0;
 }
 
@@ -77,12 +77,12 @@
 .authorName {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: $color-dark;
 }
 
 .authorLevel {
   font-size: 0.75rem;
-  color: #888;
+  color: $color-text-muted;
 }
 
 .badges {
@@ -96,15 +96,15 @@
   font-weight: 500;
   padding: 3px 10px;
   border-radius: 20px;
-  background: #f5f5f5;
-  color: #666;
-  border: 1px solid #eee;
+  background: $color-background;
+  color: $color-dark;
+  border: 1px solid $color-border;
 }
 
 .modalTitle {
   font-size: 1rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: $color-dark;
   margin: 0;
   padding: 0 20px 16px;
   line-height: 1.4;
@@ -112,7 +112,7 @@
 
 .divider {
   border: none;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid $color-border;
   margin: 0;
 }
 
@@ -126,14 +126,14 @@
   padding: 16px 20px;
 
   &:first-child {
-    border-right: 1px solid #f0f0f0;
+    border-right: 1px solid $color-border;
   }
 }
 
 .blockLabel {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #aaa;
+  color: $color-text-muted;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 10px;
@@ -141,13 +141,13 @@
 
 .infoRow {
   font-size: 0.8125rem;
-  color: #444;
+  color: $color-dark;
   margin-bottom: 5px;
 }
 
 .gymLink {
   font-size: 0.75rem;
-  color: #1a73e8;
+  color: $color-secondary;
   text-decoration: none;
   margin-top: 4px;
   display: inline-block;
@@ -163,14 +163,14 @@
 
 .description {
   font-size: 0.8125rem;
-  color: #555;
+  color: $color-dark;
   line-height: 1.6;
   margin: 0;
 }
 
 .additionalInfo {
   font-size: 0.8125rem;
-  color: #888;
+  color: $color-text-muted;
   margin: 8px 0 0;
 }
 
@@ -184,7 +184,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid $color-border;
   font-size: 0.8125rem;
 
   &:last-child {
@@ -193,16 +193,16 @@
 }
 
 .exerciseName {
-  color: #1a1a1a;
+  color: $color-dark;
 }
 
 .exerciseReps {
-  color: #888;
+  color: $color-text-muted;
 }
 
 .emptyText {
   font-size: 0.8125rem;
-  color: #aaa;
+  color: $color-text-muted;
   margin: 0;
 }
 
@@ -217,8 +217,8 @@
   align-items: center;
   gap: 7px;
   font-size: 0.8125rem;
-  color: #1a1a1a;
-  background: #f5f5f5;
+  color: $color-dark;
+  background: $color-background;
   border-radius: 20px;
   padding: 4px 12px 4px 4px;
 }

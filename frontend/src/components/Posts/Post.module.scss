@@ -8,7 +8,7 @@
 .loading,
 .emptyText {
   font-size: 0.875rem;
-  color: #888;
+  color: $color-text-muted;
   padding: 20px 0;
 }
 
@@ -16,20 +16,26 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: $color-border; border-radius: 4px; }
 }
 
 .postCard {
-  background-color: #ffffff;
+  background-color: $color-surface;
   border-radius: 12px;
   padding: 20px;
-  border: 1px solid #eee;
+  border: 1px solid $color-border;
   display: flex;
   flex-direction: column;
   gap: 14px;
   transition: border-color 0.2s ease;
 
   &:hover {
-    border-color: #d0d0d0;
+    border-color: $color-dark;
   }
 }
 
@@ -44,7 +50,7 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #eee;
+  border: 1px solid $color-border;
   flex-shrink: 0;
 }
 
@@ -59,12 +65,12 @@
 .authorName {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: $color-dark;
 }
 
 .authorLocation {
   font-size: 0.75rem;
-  color: #888;
+  color: $color-text-muted;
 }
 
 .levelBadge {
@@ -72,9 +78,9 @@
   font-weight: 500;
   padding: 3px 10px;
   border-radius: 20px;
-  background: #f5f5f5;
-  color: #666;
-  border: 1px solid #eee;
+  background: $color-background;
+  color: $color-dark;
+  border: 1px solid $color-border;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -83,7 +89,7 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: $color-dark;
   line-height: 1.4;
 }
 
@@ -94,19 +100,19 @@
 
 .metaItem {
   font-size: 0.75rem;
-  color: #888;
+  color: $color-text-muted;
 }
 
 .postDescription {
   margin: 0;
   font-size: 0.8125rem;
-  color: #555;
+  color: $color-dark;
   line-height: 1.6;
 }
 
 .moreLink {
   font-size: 0.75rem;
-  color: #1a73e8;
+  color: $color-secondary;
   cursor: pointer;
   width: fit-content;
 
@@ -117,7 +123,7 @@
 
 .cardDivider {
   border: none;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid $color-border;
   margin: 0;
 }
 
@@ -130,7 +136,7 @@
 
 .slotsTag {
   font-size: 0.75rem;
-  color: #888;
+  color: $color-text-muted;
 }
 
 .statusTag {
@@ -138,9 +144,9 @@
   font-weight: 500;
   padding: 3px 10px;
   border-radius: 20px;
-  background: #f5f5f5;
-  color: #666;
-  border: 1px solid #eee;
+  background: $color-background;
+  color: $color-dark;
+  border: 1px solid $color-border;
 }
 
 .buttonGroup {
@@ -152,14 +158,14 @@
   font-weight: 500;
   padding: 6px 16px;
   border-radius: 8px;
-  border: 1px solid #1a1a1a;
-  background: #ffffff;
-  color: #1a1a1a;
+  border: 1px solid $color-dark;
+  background: $color-surface;
+  color: $color-dark;
   cursor: pointer;
   transition: background 0.15s ease;
 
   &:hover {
-    background: #f5f5f5;
+    background: $color-background;
   }
 }
 
@@ -168,18 +174,18 @@
   font-weight: 500;
   padding: 6px 16px;
   border-radius: 8px;
-  border: 1px solid #eee;
-  background: #f5f5f5;
-  color: #666;
+  border: 1px solid $color-border;
+  background: $color-background;
+  color: $color-red;
   cursor: pointer;
 
   &:hover {
-    background: #ececec;
+    background: $color-border;
   }
 }
 
 .ownerTag {
   font-size: 0.75rem;
   font-weight: 500;
-  color: #888;
+  color: $color-text-muted;
 }

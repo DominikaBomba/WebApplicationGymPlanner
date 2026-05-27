@@ -1,9 +1,11 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './PlanCreator.module.scss';
+
 interface Props {
     onSaved?: (planId: number) => void;
 }
-export default function PlanCreator({ onSaved }: Props){
+
+export default function PlanCreator({ onSaved }: Props) {
     const [title, setTitle] = useState('');
     const [exercises, setExercises] = useState<any[]>([]);
     const [query, setQuery] = useState('');
@@ -22,6 +24,7 @@ export default function PlanCreator({ onSaved }: Props){
 
         return () => clearTimeout(timer);
     }, [query]);
+
     const performSearch = async (searchTerm: string) => {
         setIsSearching(true);
         try {
@@ -30,11 +33,11 @@ export default function PlanCreator({ onSaved }: Props){
             );
             const data = await response.json();
 
-            // Filtrujemy po nazwie po stronie klienta
+            // Client-side filtering by name
             const term = searchTerm.toLowerCase();
             const mapped = (data.results || [])
                 .map((ex: any) => {
-                    // Szukamy angielskiego tłumaczenia (language=2)
+                    // Looking for English translation (language=2)
                     const translation = ex.translations?.find((t: any) => t.language === 2);
                     return {
                         name: translation?.name ?? null,
@@ -46,14 +49,14 @@ export default function PlanCreator({ onSaved }: Props){
 
             setSuggestions(mapped);
         } catch (err) {
-            console.error("Błąd API Wger:", err);
+            alert("Failed to fetch exercises from the external database.");
         } finally {
             setIsSearching(false);
         }
     };
+
     const addExercise = (item?: any) => {
         const newEx = {
-
             name: item ? item.name : query,
             externalId: item ? String(item.id) : null,
             reps: "3x12"
@@ -74,8 +77,8 @@ export default function PlanCreator({ onSaved }: Props){
     };
 
     const handleSavePlan = async () => {
-        if (!title.trim()) return alert("Podaj nazwę planu!");
-        if (exercises.length === 0) return alert("Dodaj przynajmniej jedno ćwiczenie!");
+        if (!title.trim()) return alert("Please enter a plan title!");
+        if (exercises.length === 0) return alert("Please add at least one exercise!");
 
         setIsSaving(true);
         try {
@@ -92,15 +95,15 @@ export default function PlanCreator({ onSaved }: Props){
             if (response.ok) {
                 const data = await response.json();
                 onSaved?.(data.id);
-                alert("Plan został pomyślnie zapisany!");
+                alert("Workout plan saved successfully!");
                 setTitle('');
                 setExercises([]);
             } else {
                 const errData = await response.json();
-                alert(errData.error || "Błąd zapisu.");
+                alert(errData.error || "Failed to save the workout plan.");
             }
         } catch (error) {
-            alert("Błąd połączenia z serwerem.");
+            alert("Server connection error.");
         } finally {
             setIsSaving(false);
         }
@@ -108,24 +111,24 @@ export default function PlanCreator({ onSaved }: Props){
 
     return (
         <div className={styles.creatorContainer}>
-            <h2 className={styles.header}>Nowy Plan Treningowy</h2>
+            <h2 className={styles.header}>New Workout Plan</h2>
 
             <div className={styles.section}>
-                <label>Nazwa planu</label>
+                <label>Plan Title</label>
                 <input
                     className={styles.mainInput}
-                    placeholder="np. FBW Poniedziałek"
+                    placeholder="e.g. Full Body Workout Monday"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                 />
             </div>
 
             <div className={styles.section}>
-                <label>Dodaj ćwiczenia</label>
+                <label>Add Exercises</label>
                 <div className={styles.searchWrapper}>
                     <div className={styles.inputWithBtn}>
                         <input
-                            placeholder="Szukaj w atlasie lub wpisz własne..."
+                            placeholder="Search exercise database or type custom..."
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                         />
@@ -134,11 +137,11 @@ export default function PlanCreator({ onSaved }: Props){
                             onClick={() => addExercise()}
                             disabled={!query.trim()}
                         >
-                            Dodaj ręcznie
+                            Add custom
                         </button>
                     </div>
 
-                    {isSearching && <div className={styles.loader}>Przeszukiwanie bazy...</div>}
+                    {isSearching && <div className={styles.loader}>Searching database...</div>}
 
                     {suggestions.length > 0 && (
                         <ul className={styles.dropdown}>
@@ -162,7 +165,7 @@ export default function PlanCreator({ onSaved }: Props){
                                 className={styles.repsInput}
                                 value={ex.reps}
                                 onChange={(e) => updateReps(index, e.target.value)}
-                                placeholder="Serie/powt."
+                                placeholder="Sets/reps"
                             />
                         </div>
                         <button className={styles.removeBtn} onClick={() => removeExercise(index)}>✕</button>
@@ -175,7 +178,7 @@ export default function PlanCreator({ onSaved }: Props){
                 onClick={handleSavePlan}
                 disabled={isSaving || exercises.length === 0}
             >
-                {isSaving ? "Zapisywanie..." : "Zapisz plan w bibliotece"}
+                {isSaving ? "Saving..." : "Save plan to library"}
             </button>
         </div>
     );

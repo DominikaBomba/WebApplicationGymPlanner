@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import CloseIcon from "../../assets/icons/close.svg?react";
-
+import logo from '../../assets/logo.png';
 export default function Login() {
     const navigate = useNavigate();
 
@@ -45,7 +45,7 @@ export default function Login() {
                         <CloseIcon />
                     </Link>
                     <div className={styles["form-header"]}>
-                        <span className={styles["home-emoji"]}>💪</span>
+                           <img src={logo} alt="Gym Planner Logo" className={styles["landing-logo"]} />
                         <h1>Welcome Back!</h1>
                         <p>Enter your details and let's move on!</p>
                     </div>

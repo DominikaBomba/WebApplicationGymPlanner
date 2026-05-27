@@ -74,8 +74,8 @@ export default function Navbar({ isExpanded, setIsExpanded }: NavbarProps) {
                                 {isExpanded && <span className={styles.LinkLabel}>Profile</span>}
                             </Link>
                         </li>
-                        <li className={path === "/goals" ? styles.ActiveItem : ""}>
-                            <Link to="/goals" className={styles.NavbarLink}>
+                        <li className={path === "/stats" ? styles.ActiveItem : ""}>
+                            <Link to="/stats" className={styles.NavbarLink}>
                                 <DumbellIcon className={styles.icon} />
                                 {isExpanded && <span className={styles.LinkLabel}>Ads</span>}
                             </Link>

@@ -173,6 +173,45 @@ router.get('/details/:postId', authenticate, async (req: AuthRequest, res: Respo
         return res.status(500).json({ error: "Błąd serwera" });
     }
 });
+router.get('/discover', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        const currentUserId = Number(req.user?.userId);
+
+        const friendsRelations = await prisma.friends.findMany({
+            where: {
+                OR: [
+                    { userId: currentUserId },
+                    { friendId: currentUserId }
+                ]
+            }
+        });
+
+        const friendIds = friendsRelations.map(rel =>
+            rel.userId === currentUserId ? rel.friendId : rel.userId
+        );
+
+        const excludedIds = [...friendIds, currentUserId];
+
+        const posts = await prisma.post.findMany({
+            where: {
+                isPublic: true,
+                userId: { notIn: excludedIds }
+            },
+            include: {
+                user: { select: { id: true, nickname: true, profilePicture: true, level: true } },
+                gym: { select: { id: true, name: true, address: true, city: true, link: true, latitude: true, longitude: true } },
+                participants: { where: { participantId: currentUserId } },
+                _count: { select: { participants: true } }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        return res.status(200).json(posts);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error fetching discover posts' });
+    }
+});
 router.get('/:userId', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const currentUserId = Number(req.user?.userId);

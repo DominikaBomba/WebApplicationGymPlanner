@@ -2,15 +2,15 @@
   max-width: 600px;
   margin: 30px auto;
   padding: 25px;
-  background: #fff;
+  background: $color-surface;
   border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(36, 39, 46, 0.1);
   font-family: sans-serif;
 }
 
 .header {
   margin-top: 0;
-  color: #333;
+  color: $color-dark;
   text-align: center;
 }
 
@@ -20,17 +20,22 @@
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
-    color: #555;
+    color: $color-text-muted;
   }
 }
 
 .mainInput {
   width: 100%;
   padding: 12px;
-  border: 2px solid #eee;
+  border: 2px solid $color-border;
   border-radius: 8px;
   font-size: 1rem;
-  &:focus { border-color: #007bff; outline: none; }
+  background: $color-surface;
+  color: $color-dark;
+  &:focus {
+    border-color: $color-dark;
+    outline: none;
+  }
 }
 
 .searchWrapper {
@@ -43,19 +48,30 @@
   input {
     flex: 1;
     padding: 12px;
-    border: 2px solid #eee;
+    border: 2px solid $color-border;
     border-radius: 8px;
+    background: $color-surface;
+    color: $color-dark;
+    &:focus {
+      border-color: $color-dark;
+      outline: none;
+    }
   }
 }
 
 .addManualBtn {
-  background: #6c757d;
-  color: white;
+  background: $color-dark;
+  color: $color-surface;
   border: none;
   padding: 0 15px;
   border-radius: 8px;
   cursor: pointer;
-  &:disabled { opacity: 0.5; }
+  font-weight: 600;
+  &:disabled {
+    background: $color-border;
+    color: $color-text-muted;
+    opacity: 0.5;
+  }
 }
 
 .dropdown {
@@ -63,10 +79,10 @@
   top: 105%;
   left: 0;
   right: 0;
-  background: white;
-  border: 1px solid #ddd;
+  background: $color-surface;
+  border: 1px solid $color-border;
   border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 15px rgba(36, 39, 46, 0.1);
   z-index: 100;
   max-height: 250px;
   overflow-y: auto;
@@ -77,15 +93,16 @@
   li {
     padding: 12px;
     cursor: pointer;
-    border-bottom: 1px solid #f9f9f9;
-    &:hover { background: #f0f7ff; }
-    span { color: #888; font-size: 0.8rem; margin-left: 5px; }
+    color: $color-dark;
+    border-bottom: 1px solid $color-background;
+    &:hover { background: $color-background; }
+    span { color: $color-text-muted; font-size: 0.8rem; margin-left: 5px; }
   }
 }
 
 .exerciseList {
   margin: 20px 0;
-  background: #fdfdfd;
+  background: $color-background;
   border-radius: 10px;
 }
 
@@ -94,7 +111,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid $color-border;
   &:last-child { border-bottom: none; }
 
   .info {
@@ -104,20 +121,26 @@
     flex: 1;
   }
 
-  .name { font-weight: 500; min-width: 150px; }
+  .name { font-weight: 500; min-width: 150px; color: $color-dark; }
 
   .repsInput {
     width: 100px;
     padding: 5px 8px;
-    border: 1px solid #ccc;
+    border: 1px solid $color-border;
     border-radius: 4px;
+    background: $color-surface;
+    color: $color-dark;
+    &:focus {
+      border-color: $color-dark;
+      outline: none;
+    }
   }
 }
 
 .removeBtn {
   background: none;
   border: none;
-  color: #ff4d4d;
+  color: $color-red;
   font-size: 1.2rem;
   cursor: pointer;
   padding: 0 10px;
@@ -126,20 +149,20 @@
 .savePlanBtn {
   width: 100%;
   padding: 15px;
-  background: #28a745;
-  color: white;
+  background: $color-dark;
+  color: $color-surface;
   border: none;
   border-radius: 8px;
   font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
   transition: background 0.3s;
-  &:disabled { background: #ccc; cursor: not-allowed; }
-  &:hover:not(:disabled) { background: #218838; }
+  &:disabled { background: $color-border; color: $color-text-muted; cursor: not-allowed; }
+  &:hover:not(:disabled) { background: #000000; }
 }
 
 .loader {
   font-size: 0.8rem;
-  color: #007bff;
+  color: $color-text-muted;
   margin-top: 5px;
 }
