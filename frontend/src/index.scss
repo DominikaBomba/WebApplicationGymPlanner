@@ -8,7 +8,7 @@ body {
   height: 100vh;
   overflow: hidden;
   background-color: $color-background;
-  background-image: linear-gradient(rgba(243, 188, 220, 0.2), rgba(250, 191, 102, 0.2)), url('./assets/background4_light.png');
+  background-image: linear-gradient(rgba(243, 188, 220, 0.2), rgba(250, 191, 102, 0.2)), url('./assets/loginimage2.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -28,11 +28,9 @@ body {
   border-radius: 5rem;
   border: none;
 
-  // Kolorystyka
   background-color: $color-dark;
   color: $color-surface;
 
-  // Typografia
   font-size: 1rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -59,7 +57,7 @@ body {
 .content-wrapper {
   margin-left: 100px;
   margin-right: 1rem;
-  margin-top: calc(70px + 2rem); // 1rem gap above topbar + 70px topbar + 1rem gap below topbar
+  margin-top: calc(70px + 2rem);
   margin-bottom: 1rem;
   padding: 2rem 0;
   box-sizing: border-box;

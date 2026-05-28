@@ -3,72 +3,162 @@
   justify-content: center;
   align-items: center;
   width: 100%;
+  min-height: 100%;
+
+
   overflow: hidden;
 }
 
 .heroSection {
+  position: relative;
   width: 100%;
+  max-width: 1200px;
   text-align: center;
-  padding: 5rem 3rem;
+  padding: 3.5rem 2rem 4rem;
   border-radius: 32px;
 
+
   .landingLogo {
-    width: 250px;
-    margin-bottom: 1rem;
+    width: 100px;
+    margin-bottom: 1.5rem;
   }
 
-  .heroSubtitle {
-    font-size: 1.2rem;
+  .badge {
+    display: inline-block;
+    background: $color-primary;
+    color: $color-dark;
     font-weight: 700;
-    color: $color-text-muted;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-top: 0;
-    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    padding: 0.55rem 1.4rem;
+    border-radius: 50px;
+    margin-bottom: 1.75rem;
+  }
+
+  .heroTitle {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: $color-dark;
+    margin: 0 0 1.5rem;
   }
 
   .heroDescription {
-    font-size: 1.4rem;
+    max-width: 480px;
+    margin: 0 auto 3rem;
+    font-size: 1.1rem;
     line-height: 1.6;
     color: $color-dark;
-    margin-bottom: 4rem;
   }
+
+  .slider {
+    width: 100%;
+    overflow: hidden;
+    padding: 45px 0;          // miejsce na przechylone/uniesione kafelki
+    margin-bottom: 2rem;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .sliderTrack {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: scrollX 35s linear infinite;
+  }
+
+  .slider:hover .sliderTrack {
+    animation-play-state: paused;
+  }
+
+  .slide {
+    flex: 0 0 auto;
+    width: 175px;
+    height: 250px;
+    margin-right: 1.4rem;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+    transform-origin: center center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+
+    &:nth-child(7n + 1) { transform: translateY(-22px) rotate(-5deg); }
+    &:nth-child(7n + 2) { transform: translateY(-6px)  rotate(-3deg); }
+    &:nth-child(7n + 3) { transform: translateY(8px)   rotate(-1deg); }
+    &:nth-child(7n + 4) { transform: translateY(16px)  rotate(0deg);  }
+    &:nth-child(7n + 5) { transform: translateY(8px)   rotate(2deg);  }
+    &:nth-child(7n + 6) { transform: translateY(-6px)  rotate(3deg);  }
+    &:nth-child(7n + 7) { transform: translateY(-22px) rotate(5deg);  }
+  }
+
+  @keyframes scrollX {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
 
   .ctaContainer {
     display: flex;
-    gap: 1.5rem;
+    align-items: center;
     justify-content: center;
+    gap: 1rem;
     flex-wrap: wrap;
   }
 
-  .ctaButtonPrimary,
-  .ctaButtonSecondary {
-    padding: 1.2rem 2.5rem;
-    border-radius: 50px;
-    font-weight: 700;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    font-size: 1.2rem;
+  .ctaNote {
+    position: absolute;
+    top: 8vh;
+    left: 50vw;
+    font-family: 'Caveat', cursive;
+    font-size: 0.7rem;
+    color: $color-dark;
+    transform: rotate(6deg);
+  }
+  .arrow1{
+    position: absolute;
+    top: 9vh;
+    transform: rotateZ(180deg);
+    left: 48vw;
+    width: 80px;
+  }
+
+  .ctaNote1 {
+    position: absolute;
+    top: 40vh;
+    left: 20vw;
+    font-family: 'Caveat', cursive;
+    font-size:0.7rem;
+    color: $color-dark;
+    transform: rotate(-6deg);
+  }
+  .arrow2{
+    position: absolute;
+    top: 35vh;
+    left: 20vw;
+    width: 80px;
   }
 
   .ctaButtonPrimary {
-    background-color: $color-primary;
-    color: $color-dark;
-    box-shadow: 0 4px 15px rgba(255, 220, 108, 0.4);
+    background: $color-secondary;
+    color: #fff;
+    padding: 1.1rem 2.6rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 8px 20px rgba(232, 131, 107, 0.4);
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(255, 220, 108, 0.6);
-    }
-  }
-
-  .ctaButtonSecondary {
-    background-color: transparent;
-    color: $color-dark;
-    border: 2px solid $color-border;
-
-    &:hover {
-      background-color: rgba(36, 39, 46, 0.05);
+      box-shadow: 0 10px 26px rgba(232, 131, 107, 0.55);
     }
   }
 }

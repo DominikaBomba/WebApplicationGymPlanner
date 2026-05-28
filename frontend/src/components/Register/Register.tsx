@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, Link } from "react-router";
 import CloseIcon from "../../assets/icons/close.svg?react";
+import logo from '../../assets/logo.png';
 
 export default function Register() {
     const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function Register() {
         },
         onSuccess: () => {
             alert("Account created successfully! You can now log in.");
-            navigate("/login"); // Transition to login view after success
+            navigate("/login");
         },
     });
 
@@ -38,12 +39,22 @@ export default function Register() {
 
     return (
         <div className={styles["login-container-fullscreen"]}>
+
+            <div className={styles["login-visual"]}>
+                <h2 className={styles["visual-title"]}>
+                    Finally you decided to make<br /> an account!
+                    Good decision.. <br />you're joining the<br />
+                    elite 10 users <br />of our app  </h2>
+            </div>
+
+
             <div className={styles["login-card"]}>
                 <div className={styles["login-form-section"]}>
                     <Link to="/" className={styles.closeButton}>
                         <CloseIcon />
                     </Link>
                     <div className={styles["form-header"]}>
+                        <img src={logo} alt="Gym Planner Logo" className={styles["landing-logo"]} />
                         <h1>Create Account</h1>
                         <p>Enter your details below to join us!</p>
                     </div>
