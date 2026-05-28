@@ -150,6 +150,50 @@ describe('GET /api/posts/all', () => {
 });
 
 // ─────────────────────────────────────────────────────
+// GET /api/posts/discover
+// ─────────────────────────────────────────────────────
+describe('GET /api/posts/discover', () => {
+    it('should return discover posts (excluding friends and self) (200)', async () => {
+        // GIVEN: User has friends
+        mockPrisma.friends.findMany.mockResolvedValue([
+            { id: 1, userId: 1, friendId: 2, status: 'ACCEPTED', createdAt: new Date() }
+        ]);
+
+        mockPrisma.post.findMany.mockResolvedValue([
+            { ...mockPost, user: { id: 3, nickname: 'Stranger', profilePicture: null, level: 'BEGINNER' }, gym: mockGym, participants: [], _count: { participants: 0 } },
+        ]);
+
+        // WHEN: GET /api/posts/discover with valid token
+        const res = await request(app)
+            .get('/api/posts/discover')
+            .set('Authorization', `Bearer ${validToken}`);
+
+        // THEN: 200 with posts array
+        expect(res.status).toBe(200);
+        expect(Array.isArray(res.body)).toBe(true);
+        expect(res.body[0].user.id).toBe(3);
+
+        // Verify that Prisma was called with correct exclusions
+        expect(mockPrisma.post.findMany).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: expect.objectContaining({
+                    isPublic: true,
+                    userId: { notIn: expect.arrayContaining([1, 2]) } // 1 is currentUserId, 2 is friendId
+                })
+            })
+        );
+    });
+
+    it('should return 401 without auth token', async () => {
+        // WHEN: GET /api/posts/discover without auth
+        const res = await request(app).get('/api/posts/discover');
+
+        // THEN: 401
+        expect(res.status).toBe(401);
+    });
+});
+
+// ─────────────────────────────────────────────────────
 // POST /api/posts/join_post
 // ─────────────────────────────────────────────────────
 describe('POST /api/posts/join_post', () => {

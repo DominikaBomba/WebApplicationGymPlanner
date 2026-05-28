@@ -4,6 +4,7 @@
   padding: 32px 24px;
   background: $color-background;
   min-height: 100vh;
+  border-radius: 32px;
 
   // CSS Variables explicitly mapped for Recharts to pick up global scss colors
   --primary-color: #{$color-primary};
@@ -35,7 +36,9 @@
 }
 
 @keyframes spinLoading {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .mainTitle {
@@ -64,7 +67,9 @@
   gap: 24px;
   margin-bottom: 32px;
 
-  .section { margin-bottom: 0; }
+  .section {
+    margin-bottom: 0;
+  }
 }
 
 .summaryRow {
@@ -114,8 +119,13 @@
   border-radius: 16px;
 }
 
-.chartCard { padding: 24px; }
-.listCard  { padding: 12px; }
+.chartCard {
+  padding: 24px;
+}
+
+.listCard {
+  padding: 12px;
+}
 
 .listRow {
   display: flex;
@@ -125,7 +135,9 @@
   border-radius: 10px;
   transition: background 0.15s;
 
-  &:hover { background: $color-background; }
+  &:hover {
+    background: $color-background;
+  }
 }
 
 .rank {
@@ -160,7 +172,9 @@
   flex-direction: column;
   flex: 1;
 
-  .itemMeta { margin-top: 2px; }
+  .itemMeta {
+    margin-top: 2px;
+  }
 }
 
 .recordsGrid {
@@ -204,10 +218,27 @@
 }
 
 @media (max-width: 768px) {
-  .container { padding: 20px 16px; }
-  .mainTitle { font-size: 1.5rem; }
-  .summaryRow { grid-template-columns: repeat(2, 1fr); }
-  .summaryRow .summaryCard:nth-child(3) { grid-column: 1 / -1; }
-  .twoColumn { grid-template-columns: 1fr; }
-  .recordsGrid { grid-template-columns: 1fr; }
+  .container {
+    padding: 20px 16px;
+  }
+
+  .mainTitle {
+    font-size: 1.5rem;
+  }
+
+  .summaryRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .summaryRow .summaryCard:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+
+  .twoColumn {
+    grid-template-columns: 1fr;
+  }
+
+  .recordsGrid {
+    grid-template-columns: 1fr;
+  }
 }

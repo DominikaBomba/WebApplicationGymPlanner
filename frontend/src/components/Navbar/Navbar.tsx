@@ -11,7 +11,7 @@ import AddPost from "../AddPost";
 import ChevronRightIcon from '../../assets/icons/chevron_right.svg?react';
 import HomeIcon from '../../assets/icons/home_app_logo.svg?react';
 import PersonIcon from '../../assets/icons/person.svg?react';
-import DumbellIcon from '../../assets/icons/dumbell.svg?react';
+import BarChartIcon from '../../assets/icons/bar_chart_4_bars.svg?react';
 import LogoutIcon from '../../assets/icons/logout.svg?react';
 import SettingsIcon from '../../assets/icons/settings.svg?react';
 
@@ -57,7 +57,9 @@ export default function Navbar({ isExpanded, setIsExpanded }: NavbarProps) {
                     >
                         <ChevronRightIcon className={styles.icon} />
                     </button>
-                    <img src={isExpanded ? logo : logoIcon} className={styles.NavbarLogo} alt="Logo" />
+                    <Link to="/" style={{ outline: 'none', border: 'none', textDecoration: 'none', display: 'flex' }}>
+                        <img src={isExpanded ? logo : logoIcon} className={styles.NavbarLogo} alt="Logo" />
+                    </Link>
                 </div>
 
                 <div className={styles.MiddleSection}>
@@ -76,8 +78,8 @@ export default function Navbar({ isExpanded, setIsExpanded }: NavbarProps) {
                         </li>
                         <li className={path === "/stats" ? styles.ActiveItem : ""}>
                             <Link to="/stats" className={styles.NavbarLink}>
-                                <DumbellIcon className={styles.icon} />
-                                {isExpanded && <span className={styles.LinkLabel}>Ads</span>}
+                                <BarChartIcon className={styles.icon} />
+                                {isExpanded && <span className={styles.LinkLabel}>Stats</span>}
                             </Link>
                         </li>
                     </ul>
