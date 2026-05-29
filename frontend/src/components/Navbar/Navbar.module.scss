@@ -25,7 +25,6 @@ $topbar-height: 70px;
     left: 240px;
   }
 
-
   .registerBtn, .logoutBtn {
     padding: 0.6rem 1.5rem;
     background-color: $color-dark;
@@ -48,6 +47,35 @@ $topbar-height: 70px;
 
     &:hover {
       background-color: #ef4444;
+    }
+  }
+
+  .HamburgerBtn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+
+    span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: $color-dark;
+      border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    &.open {
+      span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+      span:nth-child(2) { opacity: 0; }
+      span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
     }
   }
 }
@@ -299,6 +327,77 @@ $topbar-height: 70px;
       .UserInfo {
         opacity: 1;
       }
+    }
+  }
+}
+
+.NavbarOverlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .NavbarHeader {
+    left: 0;
+    right: 0;
+    top: 0;
+    border-radius: 0;
+    padding: 0 1rem;
+    z-index: 30;
+
+    &.expanded {
+      left: 0;
+    }
+
+    .HamburgerBtn {
+      display: flex;
+    }
+  }
+
+  .Navbar {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 260px;
+    border-radius: 0 24px 24px 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 40;
+
+    &.expanded {
+      transform: translateX(0);
+      width: 260px;
+
+      .NavbarLink .LinkLabel {
+        opacity: 1;
+      }
+
+      .ProfileAvatar {
+        background-color: rgba(0, 0, 0, 0.03);
+
+        .UserInfo {
+          opacity: 1;
+        }
+      }
+    }
+
+    .ToggleButton {
+      display: none;
+    }
+  }
+
+  .NavbarOverlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 35;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+
+    &.visible {
+      opacity: 1;
+      pointer-events: all;
     }
   }
 }

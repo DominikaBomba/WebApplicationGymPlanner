@@ -280,7 +280,7 @@ export default function AddPost() {
                                     checked={formData.isPublic}
                                     onChange={(e) => setFormData({...formData, isPublic: e.target.checked})}
                                 />
-                                <label htmlFor="public">Public</label>
+                                <label htmlFor="public">{formData.isPublic ? "Public" : "Private"}</label>
                             </div>
                             <button
                                 className={styles.postButton}

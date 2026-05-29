@@ -8,10 +8,13 @@ import {useAuth} from '../../AuthContext';
 interface PostProps {
     feedType: 'all' | 'friends' | 'joined' | 'mine' | 'profile' | 'discover',
     userId?: number,
-    filters?: FilterState
+    filters?: FilterState,
+    excludeOwn?: boolean,
+    upcomingOnly?: boolean,
+    forceSort?: 'latest' | 'soonest' | 'oldest'
 }
 
-export default function Post({feedType, userId, filters}: PostProps) {
+export default function Post({feedType, userId, filters, excludeOwn, upcomingOnly, forceSort}: PostProps) {
     const {user: currentUser} = useAuth();
     const currentUserId = Number(currentUser?.id);
     const [allPosts, setAllPosts] = useState<any[]>([]);
@@ -47,8 +50,13 @@ export default function Post({feedType, userId, filters}: PostProps) {
         if (feedType === 'profile' && !userId) return;
         fetchPosts();
     }, [feedType, userId]);
+
     const posts = useMemo(() => {
         let result = [...allPosts];
+
+        if (excludeOwn && currentUserId) {
+            result = result.filter(p => Number(p.userId) !== currentUserId);
+        }
 
         if (filters?.city) {
             const city = filters.city.toLowerCase();
@@ -70,16 +78,22 @@ export default function Post({feedType, userId, filters}: PostProps) {
             result = result.filter(p => new Date(p.date || p.createdAt) <= to);
         }
 
-        if (filters?.sort === 'soonest') {
+        if (upcomingOnly) {
+            const now = Date.now();
+            result = result.filter(p => p.date && new Date(p.date).getTime() >= now);
+        }
+
+        const sortKey = forceSort ?? filters?.sort;
+        if (sortKey === 'soonest') {
             result.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        } else if (filters?.sort === 'oldest') {
+        } else if (sortKey === 'oldest') {
             result.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         } else {
             result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         }
 
         return result;
-    }, [allPosts, filters]);
+    }, [allPosts, filters, excludeOwn, upcomingOnly, forceSort, currentUserId]);
 
     const handleJoin = async (e: React.MouseEvent, postId: number) => {
         e.stopPropagation();
@@ -103,6 +117,7 @@ export default function Post({feedType, userId, filters}: PostProps) {
                 return;
             }
             await fetchPosts();
+            navigate('/');
         } catch (err) {
             console.error(err);
         }
@@ -135,6 +150,8 @@ export default function Post({feedType, userId, filters}: PostProps) {
         }
     };
 
+
+
     if (loading) return <div className={styles.loading}>Loading sessions...</div>;
 
     return (
@@ -147,9 +164,37 @@ export default function Post({feedType, userId, filters}: PostProps) {
             ) : (
                 <div className={styles.postsGrid}>
                     {posts.map((post: any) => {
+                        let duration : string = "";
+                        switch (post.trainingDuration){
+                            case ("FROM_1_TO_2_HOURS"):
+                                duration = "1-2 hours";
+                                break;
+                            case "LESS_THAN_1_HOUR":
+                                duration = "<1 hour";
+                                break;
+                            default:
+                                duration = ">2 hours";
+                                break;
+                        }
+
 
                         const isJoined = post.participants?.some((p: any) => Number(p.participantId) === currentUserId);
                         const isOwner = Number(post.userId) === currentUserId;
+                        const isPast = !!post.date && new Date(post.date).getTime() < Date.now();
+
+                        let countdownLabel = "";
+                        if (isJoined && !isPast && post.date) {
+                            const msPerDay = 1000 * 60 * 60 * 24;
+                            const startOfToday = new Date();
+                            startOfToday.setHours(0, 0, 0, 0);
+                            const trainingDay = new Date(post.date);
+                            trainingDay.setHours(0, 0, 0, 0);
+                            const daysUntil = Math.round((trainingDay.getTime() - startOfToday.getTime()) / msPerDay);
+                            if (daysUntil <= 0) countdownLabel = "Today";
+                            else if (daysUntil === 1) countdownLabel = "Tomorrow";
+                            else countdownLabel = `In ${daysUntil} days`;
+                        }
+
                         console.log('post.userId:', post.userId, 'currentUserId:', currentUserId, 'isOwner:', isOwner);
                         console.log('participants:', post.participants);
                         const postDate = new Date(post.date || post.createdAt);
@@ -157,7 +202,12 @@ export default function Post({feedType, userId, filters}: PostProps) {
                         const formattedTime = postDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
 
                         return (
-                            <div key={post.id} className={styles.postCard}>
+                            <div key={post.id} className={`${styles.postCard} ${isPast ? styles.postCardPast : ''}`}>
+                                {isPast && (
+                                    <div className={styles.finishedBanner}>
+                                        Finished — this session has already taken place
+                                    </div>
+                                )}
                                 <div className={styles.cardHeader}>
                                     <Link to={"../profile/" + post.user?.nickname}>
                                         <img
@@ -178,9 +228,12 @@ export default function Post({feedType, userId, filters}: PostProps) {
                                 <h3 className={styles.postTitle}>{post.title}</h3>
 
                                 <div className={styles.cardMetaRow}>
+                                    {countdownLabel && (
+                                        <span className={styles.countdownBadge}>{countdownLabel}</span>
+                                    )}
                                     <span className={styles.metaItem}>{formattedDate}</span>
                                     <span className={styles.metaItem}>{formattedTime}</span>
-                                    <span className={styles.metaItem}>{post.trainingDuration || "2h"}</span>
+                                    <span className={styles.metaItem}>{duration || "2h"}</span>
                                 </div>
 
                                 <p className={styles.postDescription}>{post.description || post.content}</p>
@@ -205,7 +258,9 @@ export default function Post({feedType, userId, filters}: PostProps) {
                                         {post.isPublic ? "Public" : "Friends"}
                                     </span>
                                     <div className={styles.buttonGroup}>
-                                        {isOwner ? (
+                                        {isPast ? (
+                                            <span className={styles.endedTag}>Ended</span>
+                                        ) : isOwner ? (
                                             <span className={styles.ownerTag}>Your post</span>
                                         ) : isJoined ? (
                                             <button className={styles.cancelButton}

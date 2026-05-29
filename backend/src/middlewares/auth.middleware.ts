@@ -49,6 +49,5 @@ export const optionalAuthenticate = (req: AuthRequest, res: Response, next: Next
         req.user = decoded;
         return next();
     } catch (error) {
-        return next(); // Ignore invalid tokens for optional auth
     }
 };

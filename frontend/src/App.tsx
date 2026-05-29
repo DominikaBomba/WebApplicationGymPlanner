@@ -9,11 +9,13 @@ import Settings from "./scenes/Settings/Settings.tsx";
 import Post from "./components/Posts";
 import Home from "./scenes/Home";
 import Stats from "./scenes/Stats";
+
 function App() {
     const [isExpanded, setIsExpanded] = useState(false);
     const location = useLocation();
 
     const showNavbar = location.pathname !== "/login" && location.pathname !== "/register";
+
     return (
         <>
             {showNavbar && <Navbar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />}
@@ -23,7 +25,13 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         <Route path={"/"} element={<Home />} />
-                        <Route path={"/stats"} element={<Stats/>} />
+
+                        <Route path={"/stats"} element={
+                            <ProtectedRoute onOpenLogin={()=>{ }}>
+                                <Stats/>
+                            </ProtectedRoute>
+
+                        } />
 
                         <Route path="/profile" element={
                             <ProtectedRoute onOpenLogin={() => { }}>

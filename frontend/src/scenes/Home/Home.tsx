@@ -14,28 +14,27 @@ export default function Home() {
     if (!token) return <LandingPage />;
     if (authLoading) return null;
 
-
     return (
         <div className={styles.dashboardContainer}>
             <Filter filters={filters} onChange={setFilters} />
-            <div className={styles.dashboardGrid}>
-                <section className={styles.feedSection}>
-                    <h2 className={styles.sectionTitle}>Joined Trainings</h2>
-                    <Post feedType="joined" filters={filters} />
-                </section>
-                <section className={styles.feedSection}>
-                    <h2 className={styles.sectionTitle}>My Training Ads</h2>
-                    <Post feedType="mine" filters={filters} />
-                </section>
-                <section className={styles.feedSection}>
-                    <h2 className={styles.sectionTitle}>Friends Activity</h2>
-                    <Post feedType="friends" filters={filters} />
-                </section>
-            </div>
+
+            <section className={styles.upcomingSection}>
+                <h2 className={styles.sectionTitle}>Upcoming – You're in</h2>
+                <Post feedType="joined" filters={filters} excludeOwn upcomingOnly forceSort="soonest" />
+            </section>
 
             <section className={styles.discoverSection}>
                 <h2 className={styles.sectionTitle}>Discover More</h2>
-                <Post feedType="discover" filters={filters} />
+                <div className={styles.discoverGrid}>
+                    <div className={styles.discoverColumn}>
+                        <h3 className={styles.columnTitle}>Friends' Activity</h3>
+                        <Post feedType="friends" filters={filters} excludeOwn />
+                    </div>
+                    <div className={styles.discoverColumn}>
+                        <h3 className={styles.columnTitle}>Public Trainings</h3>
+                        <Post feedType="discover" filters={filters} excludeOwn />
+                    </div>
+                </div>
             </section>
         </div>
     );

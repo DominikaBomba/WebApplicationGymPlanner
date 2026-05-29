@@ -107,6 +107,23 @@
   }
 }
 
+.upcomingSection {
+  background-color: $color-surface;
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(36, 39, 46, 0.03);
+display: flex;
+  flex-direction: column;
+  .sectionTitle {
+    font-size: 1.5rem;
+    color: $color-dark;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid $color-border;
+    padding-bottom: 1rem;
+  }
+}
+
 .discoverSection {
   background-color: $color-surface;
   border-radius: 24px;
@@ -120,5 +137,98 @@
     margin-bottom: 1.5rem;
     border-bottom: 1px solid $color-border;
     padding-bottom: 1rem;
+  }
+}
+
+.discoverGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+}
+
+.discoverColumn {
+  min-width: 0;
+
+}
+
+.columnTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $color-dark;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .landingPage {
+    padding: 1rem;
+    min-height: calc(100vh - 100px);
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+
+  .heroSection {
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+
+    .heroTitle {
+      font-size: 2.5rem;
+    }
+
+    .heroSubtitle {
+      font-size: 0.85rem;
+    }
+
+    .heroDescription {
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .ctaButtonPrimary, .ctaButtonSecondary {
+      font-size: 1rem;
+      padding: 0.85rem 1.5rem;
+    }
+  }
+
+  .dashboardContainer {
+    padding: 0.75rem;
+    gap: 1rem;
+  }
+
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .feedSection {
+    padding: 1.25rem;
+    border-radius: 16px;
+
+    .sectionTitle {
+      font-size: 1.2rem;
+    }
+  }
+
+  .discoverSection {
+    padding: 1.25rem;
+    border-radius: 16px;
+
+    .sectionTitle {
+      font-size: 1.2rem;
+    }
+  }
+
+  .upcomingSection {
+    padding: 1.25rem;
+    border-radius: 16px;
+
+    .sectionTitle {
+      font-size: 1.2rem;
+    }
+  }
+
+  .discoverGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
