@@ -12,14 +12,19 @@
 }
 
 .modal {
+  position: absolute;
+  top: 0;
+  left: calc(100vw - min(580px, 90%))/2;
   background: $color-surface;
   border-radius: 12px;
   border: 1px solid $color-border;
   width: 90%;
   max-width: 580px;
-  max-height: 85vh;
-  overflow-y: auto;
-  position: relative;
+  height: 85vh;
+  overflow-y: scroll;
+
+
+
 }
 
 .loadingText {
@@ -228,4 +233,33 @@
   height: 28px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 20px 20px 0 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+  }
+
+  .overlay {
+    align-items: flex-end;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .infoBlock {
+    &:first-child {
+      border-right: none;
+      border-bottom: 1px solid $color-border;
+    }
+  }
 }

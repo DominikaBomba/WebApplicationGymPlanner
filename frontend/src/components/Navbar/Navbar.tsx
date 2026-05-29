@@ -37,6 +37,15 @@ export default function Navbar({ isExpanded, setIsExpanded }: NavbarProps) {
     return (
         <>
             <div className={`${styles.NavbarHeader} ${isExpanded ? styles.expanded : ''}`}>
+                <button
+                    className={`${styles.HamburgerBtn} ${isExpanded ? styles.open : ''}`}
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    aria-label="Menu"
+                >
+                    <span />
+                    <span />
+                    <span />
+                </button>
                 <Search />
                 {token ? (
                     <button onClick={handleLogout} className={styles.logoutBtn}>
@@ -48,6 +57,11 @@ export default function Navbar({ isExpanded, setIsExpanded }: NavbarProps) {
                     </Link>
                 )}
             </div>
+
+            <div
+                className={`${styles.NavbarOverlay} ${isExpanded ? styles.visible : ''}`}
+                onClick={() => setIsExpanded(false)}
+            />
 
             <nav className={`${styles.Navbar} ${isExpanded ? styles.expanded : ''}`}>
                 <div className={styles.TopSection}>

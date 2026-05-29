@@ -14,7 +14,7 @@
 
 .postsGrid {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 16px;
   max-height: 400px;
   overflow-y: auto;
@@ -33,10 +33,33 @@
   flex-direction: column;
   gap: 14px;
   transition: border-color 0.2s ease;
-
+width: 30vw;
+  flex-shrink: 0;
   &:hover {
     border-color: $color-dark;
   }
+}
+
+.postCardPast {
+  opacity: 0.6;
+  background-color: $color-background;
+
+  &:hover {
+    border-color: $color-border;
+  }
+}
+
+.finishedBanner {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: $color-text-muted;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: 8px;
+  padding: 6px 10px;
+  text-align: center;
 }
 
 .cardHeader {
@@ -96,6 +119,17 @@
 .cardMetaRow {
   display: flex;
   gap: 16px;
+  align-items: center;
+}
+
+.countdownBadge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: $color-primary;
+  color: $color-dark;
+  white-space: nowrap;
 }
 
 .metaItem {
@@ -151,6 +185,9 @@
 
 .buttonGroup {
   margin-left: auto;
+  min-width: 80px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .joinButton {
@@ -188,4 +225,52 @@
   font-size: 0.75rem;
   font-weight: 500;
   color: $color-text-muted;
+}
+
+.endedTag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: $color-text-muted;
+}
+
+@media (max-width: 768px) {
+  .postsGrid {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+  }
+
+  .postCard {
+    padding: 14px;
+    gap: 10px;
+    border-radius: 10px;
+
+  }
+
+  .cardMetaRow {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .cardFooter {
+    gap: 8px;
+  }
+
+  .joinButton,
+  .cancelButton {
+    padding: 7px 14px;
+    font-size: 0.875rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .buttonGroup {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .slotsTag,
+  .statusTag {
+    font-size: 0.7rem;
+  }
 }

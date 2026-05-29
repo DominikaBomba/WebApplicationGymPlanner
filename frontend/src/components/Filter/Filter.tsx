@@ -1,12 +1,11 @@
 import type {FilterState} from '../../types/filters';
 import styles from './Filter.module.scss';
 
-// Filter.tsx
 const LEVELS = ['BEGINNER', 'MID', 'ADVANCED', 'PRO'];
 const SORT_OPTIONS = [
-    { value: 'latest', label: 'Newest first' },
+    { value: 'latest', label: 'oldest first' },
     { value: 'soonest', label: 'Soonest' },
-    { value: 'oldest', label: 'Oldest first' },
+    { value: 'oldest', label: 'newest first' },
 ];
 
 interface Props {
@@ -40,7 +39,6 @@ export default function Filter({ filters, onChange }: Props) {
 
     return (
         <div className={styles.filterBar}>
-
             <div className={styles.row}>
                 <div className={styles.group}>
                     <label className={styles.label}>City</label>
@@ -82,12 +80,11 @@ export default function Filter({ filters, onChange }: Props) {
                                 className={`${styles.pill} ${filters.levels.includes(level) ? styles.pillActive : ''}`}
                                 onClick={() => toggleLevel(level)}
                             >
-              {level}
-            </span>
+                                {level}
+                            </span>
                         ))}
                     </div>
                 </div>
-
 
                 <div className={styles.sortGroup}>
                     <span className={styles.sortLabel}>Sort by</span>
@@ -103,15 +100,14 @@ export default function Filter({ filters, onChange }: Props) {
                 </div>
             </div>
 
-
             {activeChips.length > 0 && (
                 <div className={styles.activeRow}>
                     <span className={styles.activeLabel}>Active:</span>
                     {activeChips.map(chip => (
                         <span key={chip.key} className={styles.chip}>
-            {chip.label}
+                            {chip.label}
                             <span className={styles.chipX} onClick={() => removeChip(chip.key)}>×</span>
-          </span>
+                        </span>
                     ))}
                     <button
                         className={styles.clearAll}
