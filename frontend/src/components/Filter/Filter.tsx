@@ -3,9 +3,9 @@ import styles from './Filter.module.scss';
 
 const LEVELS = ['BEGINNER', 'MID', 'ADVANCED', 'PRO'];
 const SORT_OPTIONS = [
-    { value: 'latest', label: 'oldest first' },
+    { value: 'latest', label: 'newest first' },
     { value: 'soonest', label: 'Soonest' },
-    { value: 'oldest', label: 'newest first' },
+    { value: 'oldest', label: 'oldest first' },
 ];
 
 interface Props {

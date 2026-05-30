@@ -93,13 +93,24 @@ export default function Post({ feedType, userId, filters, excludeOwn, upcomingOn
         }
 
         const sortKey = forceSort ?? filters?.sort;
-        if (sortKey === 'soonest') {
-            result.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        } else if (sortKey === 'oldest') {
-            result.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-        } else {
-            result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        }
+        const getIsPast = (dateStr?: string) => !!dateStr && new Date(dateStr).getTime() < Date.now();
+
+        result.sort((a, b) => {
+            const aPast = getIsPast(a.date);
+            const bPast = getIsPast(b.date);
+
+            if (aPast !== bPast) {
+                return aPast ? 1 : -1;
+            }
+
+            if (sortKey === 'soonest') {
+                return new Date(a.date).getTime() - new Date(b.date).getTime();
+            } else if (sortKey === 'oldest') {
+                return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            } else {
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            }
+        });
 
         return result;
     }, [allPosts, filters, excludeOwn, upcomingOnly, forceSort, currentUserId]);
