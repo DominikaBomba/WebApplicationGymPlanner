@@ -147,8 +147,32 @@ export default function AddPost() {
                             onChange={(e) => setFormData({...formData, gymId: e.target.value})}
                         >
                             <option value="">Select gym...</option>
-                            <option value="1">Fabryka Formy</option>
-                            <option value="2">McFit</option>
+                            <option value="">Select gym...</option>
+                            <option value="6">Calypso Fitness Arkadia (Warsaw)</option>
+                            <option value="7">Zdrofit Złote Tarasy (Warsaw)</option>
+                            <option value="1">IronHouse Gym (Warsaw)</option>
+                            <option value="2">Fit Zone (Kraków)</option>
+                            <option value="3">PowerLift Center (Gdańsk)</option>
+                            <option value="4">Urban Athletic Club (Wrocław)</option>
+                            <option value="5">CoreFit Studio (Poznań)</option>
+                            <option value="8">FitFabric (Warsaw)</option>
+                            <option value="9">Gym One Kraków (Kraków)</option>
+                            <option value="10">Fabryka Formy Kraków (Kraków)</option>
+                            <option value="11">McFIT Wrocław (Wrocław)</option>
+                            <option value="12">Fitness World Wrocław (Wrocław)</option>
+                            <option value="13">Zdrofit Poznań Stary Browar (Poznań)</option>
+                            <option value="14">Olimp Gym Poznań (Poznań)</option>
+                            <option value="15">Calypso Gdańsk Alfa (Gdańsk)</option>
+                            <option value="16">Holmes Place Gdańsk (Gdańsk)</option>
+                            <option value="17">Fitness Academy Łódź (Łódź)</option>
+                            <option value="18">Zdrofit Łódź Manufaktura (Łódź)</option>
+                            <option value="19">Gym One Katowice (Katowice)</option>
+                            <option value="20">McFIT Katowice (Katowice)</option>
+                            <option value="21">Zdrofit Szczecin Galaxy (Szczecin)</option>
+                            <option value="22">Calypso Lublin Plaza (Lublin)</option>
+                            <option value="23">Fabryka Formy Bydgoszcz (Bydgoszcz)</option>
+                            <option value="24">Fitness Planet Białystok (Białystok)</option>
+                            <option value="25">Gold's Gym Rzeszów (Rzeszów)</option>
                         </select>
 
                         <label>When?</label>
