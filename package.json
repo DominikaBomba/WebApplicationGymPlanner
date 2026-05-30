@@ -12,9 +12,12 @@
   "name": "gym-planner-workspace",
   "version": "1.0.0",
   "scripts": {
-    "install:all": "npm install && cd backend && npm install && cd ../mobile && npm install",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ../mobile && npm install",
     "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
     "dev:mobile": "cd mobile && npm start",
+    "dev:web": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "web": "npm run dev:web",
     "start": "concurrently \"npm run dev:backend\" \"npm run dev:mobile\""
   },
   "repository": {
