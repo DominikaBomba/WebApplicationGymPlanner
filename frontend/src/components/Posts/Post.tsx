@@ -1,9 +1,9 @@
-import {useEffect, useState, useMemo} from 'react';
-import {type FilterState} from '../../types/filters';
+import { useEffect, useState, useMemo } from 'react';
+import { type FilterState } from '../../types/filters';
 import styles from './Post.module.scss';
-import {Link, useNavigate} from "react-router";
+import { Link, useNavigate } from "react-router";
 import PostDetails from '../PostDetails/PostDetails';
-import {useAuth} from '../../AuthContext';
+import { useAuth } from '../../AuthContext';
 
 interface PostProps {
     feedType: 'all' | 'friends' | 'joined' | 'mine' | 'profile' | 'discover',
@@ -14,8 +14,8 @@ interface PostProps {
     forceSort?: 'latest' | 'soonest' | 'oldest'
 }
 
-export default function Post({feedType, userId, filters, excludeOwn, upcomingOnly, forceSort}: PostProps) {
-    const {user: currentUser} = useAuth();
+export default function Post({ feedType, userId, filters, excludeOwn, upcomingOnly, forceSort }: PostProps) {
+    const { user: currentUser } = useAuth();
     const currentUserId = Number(currentUser?.id);
     const [allPosts, setAllPosts] = useState<any[]>([]);
     console.log('currentUser:', currentUserId)
@@ -35,7 +35,7 @@ export default function Post({feedType, userId, filters, excludeOwn, upcomingOnl
             else if (feedType === 'profile' && userId) url = `http://localhost:3000/api/posts/${userId}`;
             else if (feedType === 'discover') url = 'http://localhost:3000/api/posts/discover';
             const response = await fetch(url, {
-                headers: {"Authorization": `Bearer ${token}`}
+                headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await response.json();
             setAllPosts(Array.isArray(data) ? data : []);
@@ -49,6 +49,15 @@ export default function Post({feedType, userId, filters, excludeOwn, upcomingOnl
     useEffect(() => {
         if (feedType === 'profile' && !userId) return;
         fetchPosts();
+
+        const handlePostAction = () => {
+            fetchPosts();
+        };
+
+        window.addEventListener('post-action-success', handlePostAction);
+        return () => {
+            window.removeEventListener('post-action-success', handlePostAction);
+        };
     }, [feedType, userId]);
 
     const posts = useMemo(() => {
@@ -109,14 +118,14 @@ export default function Post({feedType, userId, filters, excludeOwn, upcomingOnl
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({postId: Number(postId)})
+                body: JSON.stringify({ postId: Number(postId) })
             });
             const data = await response.json();
             if (!response.ok) {
                 console.error('Join error:', data);
                 return;
             }
-            await fetchPosts();
+            window.dispatchEvent(new CustomEvent('post-action-success'));
             navigate('/');
         } catch (err) {
             console.error(err);
@@ -137,14 +146,14 @@ export default function Post({feedType, userId, filters, excludeOwn, upcomingOnl
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({postId: Number(postId)})
+                body: JSON.stringify({ postId: Number(postId) })
             });
             const data = await response.json();
             if (!response.ok) {
                 console.error('Leave error:', data);
                 return;
             }
-            await fetchPosts();
+            window.dispatchEvent(new CustomEvent('post-action-success'));
         } catch (err) {
             console.error(err);
         }
@@ -157,15 +166,15 @@ export default function Post({feedType, userId, filters, excludeOwn, upcomingOnl
     return (
         <div className={styles.feedContainer}>
             {selectedPostId && (
-                <PostDetails postId={selectedPostId} onClose={() => setSelectedPostId(null)}/>
+                <PostDetails postId={selectedPostId} onClose={() => setSelectedPostId(null)} />
             )}
             {posts.length === 0 ? (
                 <p className={styles.emptyText}>No active training sessions.</p>
             ) : (
                 <div className={styles.postsGrid}>
                     {posts.map((post: any) => {
-                        let duration : string = "";
-                        switch (post.trainingDuration){
+                        let duration: string = "";
+                        switch (post.trainingDuration) {
                             case ("FROM_1_TO_2_HOURS"):
                                 duration = "1-2 hours";
                                 break;
@@ -199,7 +208,7 @@ export default function Post({feedType, userId, filters, excludeOwn, upcomingOnl
                         console.log('participants:', post.participants);
                         const postDate = new Date(post.date || post.createdAt);
                         const formattedDate = postDate.toLocaleDateString('en-GB');
-                        const formattedTime = postDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+                        const formattedTime = postDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                         return (
                             <div key={post.id} className={`${styles.postCard} ${isPast ? styles.postCardPast : ''}`}>
@@ -248,7 +257,7 @@ export default function Post({feedType, userId, filters, excludeOwn, upcomingOnl
                                     See training plan & more
                                 </span>
 
-                                <hr className={styles.cardDivider}/>
+                                <hr className={styles.cardDivider} />
 
                                 <div className={styles.cardFooter}>
                                     <span className={styles.slotsTag}>
@@ -264,12 +273,12 @@ export default function Post({feedType, userId, filters, excludeOwn, upcomingOnl
                                             <span className={styles.ownerTag}>Your post</span>
                                         ) : isJoined ? (
                                             <button className={styles.cancelButton}
-                                                    onClick={(e) => handleLeave(e, post.id)}>
+                                                onClick={(e) => handleLeave(e, post.id)}>
                                                 Leave
                                             </button>
                                         ) : (
                                             <button className={styles.joinButton}
-                                                    onClick={(e) => handleJoin(e, post.id)}>
+                                                onClick={(e) => handleJoin(e, post.id)}>
                                                 Join
                                             </button>
                                         )}
