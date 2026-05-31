@@ -108,18 +108,14 @@ describe('POST /api/posts', () => {
 // GET /api/posts/all (public feed)
 // ─────────────────────────────────────────────────────
 describe('GET /api/posts/all', () => {
-    it('should return public posts without auth (200)', async () => {
-        // GIVEN: Public posts exist
-        mockPrisma.post.findMany.mockResolvedValue([
-            { ...mockPost, user: { id: 1, nickname: 'Test', profilePicture: null, level: 'BEGINNER' }, gym: mockGym, participants: [], _count: { participants: 0 } },
-        ]);
+    it('should return 401 without auth token', async () => {
+        // GIVEN: No Authorization header
 
-        // WHEN: GET /api/posts/all without auth (optional auth)
+        // WHEN: GET /api/posts/all without auth
         const res = await request(app).get('/api/posts/all');
 
-        // THEN: 200 with posts array
-        expect(res.status).toBe(200);
-        expect(Array.isArray(res.body)).toBe(true);
+        // THEN: 401 — authentication is now required
+        expect(res.status).toBe(401);
     });
 
     it('should return public posts with auth (200)', async () => {

@@ -1,8 +1,8 @@
 /**
- * Tests for authenticate and optionalAuthenticate middlewares.
+ * Tests for authenticate middleware.
  */
 import { Request, Response, NextFunction } from 'express';
-import { authenticate, optionalAuthenticate, AuthRequest } from '../../middlewares/auth.middleware';
+import { authenticate, AuthRequest } from '../../middlewares/auth.middleware';
 import {
     TEST_JWT_SECRET,
     generateValidToken,
@@ -123,64 +123,5 @@ describe('authenticate middleware', () => {
         expect(req.user?.login).toBe('test@test.com');
         expect(next).toHaveBeenCalled();
         expect(res.status).not.toHaveBeenCalled();
-    });
-});
-
-// ─────────────────────────────────────────────────────
-// optionalAuthenticate middleware
-// ─────────────────────────────────────────────────────
-describe('optionalAuthenticate middleware', () => {
-    it('should call next() without setting user when no token is provided', () => {
-        // GIVEN: Request has no Authorization header
-        const { req, res, next } = createMocks();
-
-        // WHEN: optionalAuthenticate is called
-        optionalAuthenticate(req, res, next);
-
-        // THEN: next() called, user remains undefined
-        expect(next).toHaveBeenCalled();
-        expect(req.user).toBeUndefined();
-    });
-
-    it('should call next() without setting user when token is the string "null"', () => {
-        // GIVEN: Authorization header contains literal string "null"
-        const { req, res, next } = createMocks();
-        req.headers.authorization = 'Bearer null';
-
-        // WHEN: optionalAuthenticate is called
-        optionalAuthenticate(req, res, next);
-
-        // THEN: next() called, user remains undefined (special case in code)
-        expect(next).toHaveBeenCalled();
-        expect(req.user).toBeUndefined();
-    });
-
-    it('should call next() without setting user when token is invalid', () => {
-        // GIVEN: An invalid token in the Authorization header
-        const { req, res, next } = createMocks();
-        req.headers.authorization = 'Bearer invalid.token.data';
-
-        // WHEN: optionalAuthenticate is called
-        optionalAuthenticate(req, res, next);
-
-        // THEN: next() called, user undefined (error is silently ignored)
-        expect(next).toHaveBeenCalled();
-        expect(req.user).toBeUndefined();
-    });
-
-    it('should attach user and call next() when token is valid', () => {
-        // GIVEN: A valid JWT in the Authorization header
-        const { req, res, next } = createMocks();
-        const validToken = generateValidToken({ userId: '1', login: 'test@test.com' });
-        req.headers.authorization = `Bearer ${validToken}`;
-
-        // WHEN: optionalAuthenticate is called
-        optionalAuthenticate(req, res, next);
-
-        // THEN: req.user is set, next() called
-        expect(req.user).toBeDefined();
-        expect(req.user?.userId).toBe('1');
-        expect(req.user?.login).toBe('test@test.com');
-        expect(next).toHaveBeenCalled();
     });
 });
