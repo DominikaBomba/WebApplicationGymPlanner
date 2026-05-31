@@ -77,7 +77,7 @@ export default function PostDetails({ postId, onClose }: PostDetailsProps) {
                     <div className={styles.infoBlock}>
                         <p className={styles.blockLabel}>Details</p>
                         <div className={styles.infoRow}>{post.trainingDuration.replace(/_/g, ' ')}</div>
-                        <div className={styles.infoRow}>{post.participants.length} / {post.maxParticipants || 'No limit'} spots taken</div>
+                        <div className={styles.infoRow} data-testid="spots-taken">{post.participants.length} / {post.maxParticipants || 'No limit'} spots taken</div>
                     </div>
                 </div>
 
@@ -115,7 +115,7 @@ export default function PostDetails({ postId, onClose }: PostDetailsProps) {
                 <hr className={styles.divider} />
 
                 <div className={styles.section}>
-                    <p className={styles.blockLabel}>Participants ({post.participants.length})</p>
+                    <p className={styles.blockLabel} data-testid="participants-label">Participants ({post.participants.length})</p>
                     {post.participants.length === 0 ? (
                         <p className={styles.emptyText}>No one has joined yet.</p>
                     ) : (

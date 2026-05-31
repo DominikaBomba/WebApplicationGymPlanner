@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import styles from './Search.module.scss';
 import SearchIcon from '../../assets/icons/search.svg?react';
 

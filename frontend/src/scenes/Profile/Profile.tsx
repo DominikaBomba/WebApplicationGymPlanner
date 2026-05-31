@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import { useAuth } from "../../AuthContext";
 import { useEffect, useState } from 'react';
 import styles from './Profile.module.scss';
